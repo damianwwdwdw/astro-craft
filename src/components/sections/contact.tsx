@@ -1,4 +1,5 @@
 import { Mail, Phone } from "lucide-react";
+import { ContactForm } from "@/components/contact-form";
 import { CONTAINER, SectionHeading } from "@/components/sections/shared";
 
 const SOCIAL_LINKS = [
@@ -21,7 +22,9 @@ export function Contact() {
         description="Zadzwoń lub napisz"
       />
 
-      <div className="mt-10 flex flex-col items-center gap-6">
+      <div className="mt-10 flex flex-col items-center gap-10">
+        <ContactForm />
+
         <div className="flex flex-col gap-3 sm:flex-row">
           <a
             href="tel:889085455"
