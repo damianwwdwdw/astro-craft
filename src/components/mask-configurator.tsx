@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -163,18 +163,11 @@ export function MaskConfigurator() {
           )}
 
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Skontaktuj się telefonicznie, e-mailowo lub przez social media i
-            przekaż tę specyfikację — przygotuję wycenę.
+            Skontaktuj się mailowo lub przez social media i przekaż tę
+            specyfikację — przygotuję wycenę.
           </p>
 
           <div className="flex flex-col gap-2">
-            <a
-              href="tel:889085455"
-              className="from-brand-violet to-brand-periwinkle font-heading inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(124,92,252,0.7)] transition-transform hover:-translate-y-0.5"
-            >
-              <Phone className="size-4" />
-              889 085 455
-            </a>
             <a
               href="mailto:kontakt@astro-craft.pl"
               className="from-brand-violet to-brand-periwinkle font-heading inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(124,92,252,0.7)] transition-transform hover:-translate-y-0.5"

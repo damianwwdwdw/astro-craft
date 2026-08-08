@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Minus, Phone, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Mail, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -178,13 +178,6 @@ export default function CartPage() {
                     >
                       <Mail className="size-4" />
                       Wyślij zapytanie mailem
-                    </a>
-                    <a
-                      href="tel:889085455"
-                      className="border-border hover:bg-muted font-heading inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold transition-colors"
-                    >
-                      <Phone className="size-4" />
-                      889 085 455
                     </a>
                   </div>
                 </CardContent>

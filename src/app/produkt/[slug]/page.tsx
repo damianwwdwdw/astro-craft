@@ -1,4 +1,4 @@
-import { ArrowLeft, Phone } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -84,11 +84,11 @@ export default async function ProductPage({
               )}
 
               <a
-                href="tel:889085455"
+                href="mailto:kontakt@astro-craft.pl"
                 className="text-muted-foreground hover:text-foreground mt-1 inline-flex w-fit items-center gap-2 text-sm font-medium transition-colors"
               >
-                <Phone className="size-4" />
-                Zapytaj telefonicznie: 889 085 455
+                <Mail className="size-4" />
+                Zapytaj mailowo: kontakt@astro-craft.pl
               </a>
             </div>
           </div>
