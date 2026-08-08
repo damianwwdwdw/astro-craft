@@ -1,0 +1,293 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --color-brand-violet: var(--brand-violet);
+  --color-brand-periwinkle: var(--brand-periwinkle);
+  --color-brand-lavender: var(--brand-lavender);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-paper: var(--brand-paper);
+  --color-brand-bg-deep: var(--brand-bg-deep);
+  --color-brand-bg-mid: var(--brand-bg-mid);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Astro Craft brand palette (matches astro-craft.pl) */
+  --brand-bg-deep: #0a0a1a;
+  --brand-bg-mid: #14103a;
+  --brand-violet: #7c5cfc;
+  --brand-periwinkle: #6d7fe0;
+  --brand-lavender: #c9bfff;
+  --brand-ink: #0f1229;
+  --brand-paper: #fbfaff;
+  --brand-muted: rgba(251, 250, 255, 0.62);
+
+  --background: var(--brand-bg-deep);
+  --foreground: var(--brand-paper);
+  --card: #14103a;
+  --card-foreground: var(--brand-paper);
+  --popover: #171236;
+  --popover-foreground: var(--brand-paper);
+  --primary: var(--brand-violet);
+  --primary-foreground: var(--brand-paper);
+  --secondary: var(--brand-periwinkle);
+  --secondary-foreground: var(--brand-paper);
+  --muted: #171236;
+  --muted-foreground: var(--brand-muted);
+  --accent: var(--brand-periwinkle);
+  --accent-foreground: var(--brand-paper);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: rgba(201, 191, 255, 0.16);
+  --input: rgba(201, 191, 255, 0.16);
+  --ring: var(--brand-violet);
+  --chart-1: var(--brand-violet);
+  --chart-2: var(--brand-periwinkle);
+  --chart-3: var(--brand-lavender);
+  --chart-4: oklch(0.556 0 0);
+  --chart-5: oklch(0.371 0 0);
+  --radius: 0.9rem;
+  --sidebar: var(--brand-ink);
+  --sidebar-foreground: var(--brand-paper);
+  --sidebar-primary: var(--brand-violet);
+  --sidebar-primary-foreground: var(--brand-paper);
+  --sidebar-accent: var(--brand-periwinkle);
+  --sidebar-accent-foreground: var(--brand-paper);
+  --sidebar-border: rgba(201, 191, 255, 0.16);
+  --sidebar-ring: var(--brand-violet);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply text-foreground;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124, 92, 252, 0.35), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 85% 90%, rgba(109, 127, 224, 0.25), transparent 60%),
+      linear-gradient(180deg, var(--brand-bg-deep) 0%, var(--brand-bg-mid) 100%);
+    background-attachment: fixed;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-spin-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes star-arms-long-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes star-arms-short-pulse {
+  0%,
+  100% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/*
+ * Tracks the real telescope tube cut out of the logo (see
+ * public/logo-hero-tube.png) so it stays aimed at the orbiting star. Angles
+ * precomputed via atan2 against the tube's actual pivot (the eyepiece ring
+ * center, which stays fixed in public/logo-hero-base.png) and its baked-in
+ * drawn angle, so the rotation lands exactly on the star each frame instead
+ * of an approximate sweep.
+ */
+@keyframes logo-tube-track {
+  0% {
+    transform: rotate(-39.1deg);
+  }
+  4.1667% {
+    transform: rotate(-25.6deg);
+  }
+  8.3333% {
+    transform: rotate(-13deg);
+  }
+  12.5% {
+    transform: rotate(-1.1deg);
+  }
+  16.6667% {
+    transform: rotate(10.4deg);
+  }
+  20.8333% {
+    transform: rotate(21.5deg);
+  }
+  25% {
+    transform: rotate(32.5deg);
+  }
+  29.1667% {
+    transform: rotate(43.4deg);
+  }
+  33.3333% {
+    transform: rotate(54.3deg);
+  }
+  37.5% {
+    transform: rotate(65.3deg);
+  }
+  41.6667% {
+    transform: rotate(76.6deg);
+  }
+  45.8333% {
+    transform: rotate(88.2deg);
+  }
+  50% {
+    transform: rotate(100.3deg);
+  }
+  54.1667% {
+    transform: rotate(113.1deg);
+  }
+  58.3333% {
+    transform: rotate(127deg);
+  }
+  62.5% {
+    transform: rotate(142.3deg);
+  }
+  66.6667% {
+    transform: rotate(159.6deg);
+  }
+  70.8333% {
+    transform: rotate(179.4deg);
+  }
+  75% {
+    transform: rotate(201.7deg);
+  }
+  79.1667% {
+    transform: rotate(225.6deg);
+  }
+  83.3333% {
+    transform: rotate(249.1deg);
+  }
+  87.5% {
+    transform: rotate(270.6deg);
+  }
+  91.6667% {
+    transform: rotate(289.5deg);
+  }
+  95.8333% {
+    transform: rotate(306.1deg);
+  }
+  100% {
+    transform: rotate(320.9deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-twinkle {
+    animation: twinkle var(--twinkle-duration, 4s) ease-in-out infinite;
+    animation-delay: var(--twinkle-delay, 0s);
+  }
+
+  .animate-orbit {
+    animation: orbit-spin 20s linear infinite;
+  }
+
+  .animate-orbit-counter {
+    animation: orbit-spin-reverse 20s linear infinite;
+  }
+
+  .animate-logo-tube-track {
+    animation: logo-tube-track 20s linear infinite;
+  }
+
+  .star-arms-long {
+    animation: star-arms-long-pulse 2.4s ease-in-out infinite;
+    transform-origin: 0 0;
+  }
+
+  .star-arms-short {
+    animation: star-arms-short-pulse 3.1s ease-in-out infinite;
+    animation-delay: 0.4s;
+    transform-origin: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-logo-tube-track {
+    transform: rotate(-39.1deg);
+  }
+}
+
+/*
+ * White outline around the tube so it stays legible when it rotates over
+ * the "ASTRO" letters underneath (both are the same navy, so without this
+ * the tube visually merges into the letterforms as it sweeps past them).
+ * Uses a true morphological dilation (SVG filter, defined inline in
+ * hero.tsx) rather than stacked drop-shadows, so the outline is uniformly
+ * thick regardless of edge angle on the diagonal tube shape.
+ */
+.tube-outline {
+  filter: url(#tubeOutlineFilter);
+}
