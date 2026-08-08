@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { parseAttachments } from "@/lib/parse-attachments";
 
 export const runtime = "nodejs";
-
-// Kept comfortably under Vercel Functions' hard 4.5MB request-body limit,
-// leaving headroom for multipart overhead and other form fields.
-export const MAX_TOTAL_SIZE_BYTES = 4 * 1024 * 1024;
 
 export async function POST(request: Request) {
   if (!process.env.RESEND_API_KEY) {
@@ -15,9 +12,9 @@ export async function POST(request: Request) {
     );
   }
 
-  let formData: FormData;
+  let body: unknown;
   try {
-    formData = await request.formData();
+    body = await request.json();
   } catch {
     return NextResponse.json(
       { success: false, error: "Nieprawidłowe dane formularza." },
@@ -25,45 +22,35 @@ export async function POST(request: Request) {
     );
   }
 
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const files = formData
-    .getAll("attachments")
-    .filter((value): value is File => value instanceof File && value.size > 0);
+  const { name, email, description, attachments: rawAttachments } = (body ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const nameStr = String(name ?? "").trim();
+  const emailStr = String(email ?? "").trim();
+  const descriptionStr = String(description ?? "").trim();
+  const attachments = parseAttachments(rawAttachments);
 
-  if (!email || !description) {
+  if (!emailStr || !descriptionStr) {
     return NextResponse.json(
       { success: false, error: "Podaj adres e-mail i opis projektu." },
       { status: 400 }
     );
   }
 
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-  if (totalSize > MAX_TOTAL_SIZE_BYTES) {
-    return NextResponse.json(
-      { success: false, error: "Załączniki są zbyt duże (limit 4 MB łącznie)." },
-      { status: 413 }
-    );
-  }
+  const attachmentsText =
+    attachments.length > 0
+      ? `\n\nZałączniki:\n${attachments.map((a) => `- ${a.filename}: ${a.url}`).join("\n")}`
+      : "";
 
   try {
-    const attachments = await Promise.all(
-      files.map(async (file) => ({
-        filename: file.name,
-        content: Buffer.from(await file.arrayBuffer()),
-      }))
-    );
-
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      // TODO: po weryfikacji domeny astro-craft.pl w Resend zmień na np. zamowienia@astro-craft.pl
-      from: "Astro Craft <onboarding@resend.dev>",
+      from: "Astro Craft <kontakt@astro-craft.pl>",
       to: "kontakt@astro-craft.pl",
-      replyTo: email,
-      subject: `Nowe zapytanie o projekt na zamówienie${name ? ` — ${name}` : ""}`,
-      text: `Imię: ${name || "(nie podano)"}\nE-mail: ${email}\n\nOpis projektu:\n${description}`,
-      attachments,
+      replyTo: emailStr,
+      subject: `Nowe zapytanie o projekt na zamówienie${nameStr ? ` — ${nameStr}` : ""}`,
+      text: `Imię: ${nameStr || "(nie podano)"}\nE-mail: ${emailStr}\n\nOpis projektu:\n${descriptionStr}${attachmentsText}`,
     });
 
     if (error) {

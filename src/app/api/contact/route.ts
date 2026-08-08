@@ -1,26 +1,8 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { parseAttachments } from "@/lib/parse-attachments";
 
 export const runtime = "nodejs";
-
-const MAX_ATTACHMENTS = 10;
-
-type Attachment = { url: string; filename: string };
-
-function parseAttachments(value: unknown): Attachment[] {
-  if (!Array.isArray(value)) return [];
-  const attachments: Attachment[] = [];
-  for (const item of value.slice(0, MAX_ATTACHMENTS)) {
-    if (typeof item !== "object" || item === null) continue;
-    const { url, filename } = item as Record<string, unknown>;
-    if (typeof url !== "string" || !url.startsWith("https://")) continue;
-    attachments.push({
-      url,
-      filename: typeof filename === "string" && filename ? filename.slice(0, 200) : "załącznik",
-    });
-  }
-  return attachments;
-}
 
 export async function POST(request: Request) {
   if (!process.env.RESEND_API_KEY) {
@@ -64,8 +46,7 @@ export async function POST(request: Request) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      // TODO: po weryfikacji domeny astro-craft.pl w Resend zmień na np. kontakt@astro-craft.pl
-      from: "Astro Craft <onboarding@resend.dev>",
+      from: "Astro Craft <kontakt@astro-craft.pl>",
       to: "kontakt@astro-craft.pl",
       replyTo: emailStr,
       subject: `Nowa wiadomość z formularza kontaktowego${nameStr ? ` — ${nameStr}` : ""}`,

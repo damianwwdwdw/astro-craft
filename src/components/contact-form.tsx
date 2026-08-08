@@ -1,104 +1,51 @@
 "use client";
 
-import { upload } from "@vercel/blob/client";
-import { AlertCircle, CheckCircle2, Paperclip, X } from "lucide-react";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { AttachmentField } from "@/components/attachment-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  ALLOWED_ATTACHMENT_TYPES,
-  MAX_FILE_SIZE_BYTES,
-  MAX_TOTAL_SIZE_BYTES,
-} from "@/lib/attachment-limits";
-import { cn } from "@/lib/utils";
+import { ALLOWED_ATTACHMENT_TYPES } from "@/lib/attachment-limits";
+import { useAttachmentUpload } from "@/lib/use-attachment-upload";
 
 const ACCEPT = ALLOWED_ATTACHMENT_TYPES.join(",");
-
-function formatSize(bytes: number) {
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export function ContactForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileError, setFileError] = useState("");
   const [status, setStatus] = useState<
     "idle" | "uploading" | "sending" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
-
-  function handleFilesChange(event: ChangeEvent<HTMLInputElement>) {
-    const picked = Array.from(event.target.files ?? []);
-    event.target.value = "";
-    if (picked.length === 0) return;
-
-    setFileError("");
-
-    const allowedTypes: readonly string[] = ALLOWED_ATTACHMENT_TYPES;
-    const invalidType = picked.find((file) => !allowedTypes.includes(file.type));
-    if (invalidType) {
-      setFileError(`Niedozwolony format pliku: ${invalidType.name}`);
-      return;
-    }
-
-    const tooBig = picked.find((file) => file.size > MAX_FILE_SIZE_BYTES);
-    if (tooBig) {
-      setFileError(`Plik za duży: ${tooBig.name} (maks. 10 MB na plik)`);
-      return;
-    }
-
-    const newTotal = totalSize + picked.reduce((sum, file) => sum + file.size, 0);
-    if (newTotal > MAX_TOTAL_SIZE_BYTES) {
-      setFileError("Łączny rozmiar załączników nie może przekraczać 20 MB.");
-      return;
-    }
-
-    setFiles((current) => [...current, ...picked]);
-  }
-
-  function removeFile(index: number) {
-    setFiles((current) => current.filter((_, i) => i !== index));
-    setFileError("");
-  }
+  const attachments = useAttachmentUpload({
+    handleUploadUrl: "/api/contact/upload",
+    allowedTypes: ALLOWED_ATTACHMENT_TYPES,
+  });
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!email.trim() || !message.trim() || fileError) return;
+    if (!email.trim() || !message.trim() || attachments.fileError) return;
 
     setErrorMessage("");
 
     try {
-      let attachments: { url: string; filename: string }[] = [];
+      let uploaded: { url: string; filename: string }[] = [];
 
-      if (files.length > 0) {
+      if (attachments.files.length > 0) {
         setStatus("uploading");
-        const uploaded = await Promise.all(
-          files.map((file) =>
-            upload(file.name, file, {
-              access: "public",
-              handleUploadUrl: "/api/contact/upload",
-              contentType: file.type,
-            })
-          )
-        );
-        attachments = uploaded.map((blob, index) => ({
-          url: blob.url,
-          filename: files[index].name,
-        }));
+        uploaded = await attachments.uploadAll();
       }
 
       setStatus("sending");
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, attachments }),
+        body: JSON.stringify({ name, email, message, attachments: uploaded }),
       });
       const data = await response.json();
 
@@ -112,7 +59,7 @@ export function ContactForm() {
       setName("");
       setEmail("");
       setMessage("");
-      setFiles([]);
+      attachments.reset();
     } catch {
       setStatus("error");
       setErrorMessage("Nie udało się przesłać załączników. Spróbuj ponownie.");
@@ -178,49 +125,17 @@ export function ContactForm() {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="contact-files">Załączniki</Label>
-            <Input
-              id="contact-files"
-              type="file"
-              multiple
-              accept={ACCEPT}
-              disabled={busy}
-              onChange={handleFilesChange}
-            />
-            {files.length > 0 && (
-              <ul className="flex flex-col gap-1.5">
-                {files.map((file, index) => (
-                  <li
-                    key={`${file.name}-${file.lastModified}-${index}`}
-                    className="bg-muted/50 flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs"
-                  >
-                    <Paperclip className="text-muted-foreground size-3.5 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate">{file.name}</span>
-                    <span className="text-muted-foreground shrink-0">
-                      {formatSize(file.size)}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => removeFile(index)}
-                      aria-label={`Usuń ${file.name}`}
-                      className="text-muted-foreground hover:text-destructive shrink-0"
-                    >
-                      <X className="size-3.5" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className={cn("text-xs", fileError ? "text-destructive" : "text-muted-foreground")}>
-              {fileError
-                ? fileError
-                : files.length > 0
-                  ? `${files.length} ${files.length === 1 ? "plik" : "pliki"}, ${formatSize(totalSize)} / 20 MB`
-                  : "Zdjęcia (jpg, png, gif, webp, svg) lub PDF. Maks. 10 MB na plik, 20 MB łącznie."}
-            </p>
-          </div>
+          <AttachmentField
+            id="contact-files"
+            files={attachments.files}
+            fileError={attachments.fileError}
+            totalSize={attachments.totalSize}
+            onFilesChange={attachments.handleFilesChange}
+            onRemoveFile={attachments.removeFile}
+            disabled={busy}
+            accept={ACCEPT}
+            hint="Zdjęcia (jpg, png, gif, webp, svg) lub PDF."
+          />
         </CardContent>
       </Card>
 
@@ -234,7 +149,7 @@ export function ContactForm() {
       <Button
         type="submit"
         size="lg"
-        disabled={busy || !!fileError}
+        disabled={busy || !!attachments.fileError}
         className="from-brand-violet to-brand-periwinkle w-fit self-center bg-gradient-to-br px-8 py-3 text-white"
       >
         {status === "uploading"
