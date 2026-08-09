@@ -1,3 +1,5 @@
+export type ReviewStatus = "pending" | "approved";
+
 export type Review = {
   id: number;
   name: string;
@@ -6,6 +8,8 @@ export type Review = {
   photoUrl: string | null;
   createdAt: string;
 };
+
+export type AdminReview = Review & { status: ReviewStatus };
 
 export const MAX_NAME_LENGTH = 100;
 export const MAX_CONTENT_LENGTH = 2000;

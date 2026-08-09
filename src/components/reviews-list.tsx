@@ -42,13 +42,9 @@ export function ReviewsList() {
     };
   }, []);
 
-  function handleSubmitted(review: Review) {
-    setReviews((current) => [review, ...(current ?? [])]);
-  }
-
   return (
     <div className="flex flex-col gap-12">
-      <ReviewForm onSubmitted={handleSubmitted} />
+      <ReviewForm />
 
       {reviews === null ? (
         loadError ? (

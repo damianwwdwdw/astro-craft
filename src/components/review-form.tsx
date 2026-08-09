@@ -1,7 +1,7 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
-import { AlertCircle, Paperclip, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Paperclip, X } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { StarRatingInput } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/attachment-limits";
-import type { Review } from "@/lib/reviews";
 
 const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
 const MAX_FILE_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
@@ -19,7 +18,7 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ReviewForm({ onSubmitted }: { onSubmitted: (review: Review) => void }) {
+export function ReviewForm() {
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(0);
@@ -87,16 +86,31 @@ export function ReviewForm({ onSubmitted }: { onSubmitted: (review: Review) => v
       }
 
       setStatus("success");
-      onSubmitted(data.review);
       setName("");
       setContent("");
       setRating(0);
       setPhoto(null);
-      window.setTimeout(() => setStatus("idle"), 2000);
     } catch {
       setStatus("error");
       setErrorMessage("Nie udało się przesłać opinii. Spróbuj ponownie.");
     }
+  }
+
+  if (status === "success") {
+    return (
+      <Card className="mx-auto w-full max-w-md">
+        <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
+          <CheckCircle2 className="text-brand-violet size-8" />
+          <p className="font-heading font-semibold">Dziękuję za opinię!</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Pojawi się publicznie po zatwierdzeniu.
+          </p>
+          <Button type="button" variant="outline" onClick={() => setStatus("idle")}>
+            Dodaj kolejną opinię
+          </Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -181,13 +195,11 @@ export function ReviewForm({ onSubmitted }: { onSubmitted: (review: Review) => v
         disabled={busy || !!photoError || !name.trim() || !content.trim() || rating < 1}
         className="from-brand-violet to-brand-periwinkle w-fit self-center bg-gradient-to-br px-8 py-3 text-white"
       >
-        {status === "uploading"
-          ? "Przesyłanie zdjęcia..."
-          : status === "sending"
-            ? "Wysyłanie..."
-            : status === "success"
-              ? "Dodano!"
-              : "Dodaj opinię"}
+        {busy
+          ? status === "uploading"
+            ? "Przesyłanie zdjęcia..."
+            : "Wysyłanie..."
+          : "Dodaj opinię"}
       </Button>
     </form>
   );
