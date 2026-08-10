@@ -2,27 +2,30 @@
 
 import { createContext, useCallback, useContext, useSyncExternalStore, type ReactNode } from "react";
 
+export type CartItemSpec = { label: string; value: string };
+
 export type CartItem = {
+  id: string;
   productSlug: string;
   productTitle: string;
-  productImage: string;
-  colorId: string;
-  colorName: string;
+  productImage?: string;
   quantity: number;
+  /** Wariant kolorystyczny (np. szukacz laserowy). */
+  colorId?: string;
+  colorName?: string;
+  /** Specyfikacja produktu skonfigurowanego na miarę (np. maska Bahtinova). */
+  specs?: CartItemSpec[];
 };
+
+type NewCartItem = Omit<CartItem, "quantity" | "id">;
 
 type CartContextValue = {
   items: CartItem[];
   itemCount: number;
-  addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (productSlug: string, colorId: string) => void;
-  updateQuantity: (productSlug: string, colorId: string, quantity: number) => void;
-  updateColor: (
-    productSlug: string,
-    oldColorId: string,
-    newColorId: string,
-    newColorName: string
-  ) => void;
+  addItem: (item: NewCartItem, quantity?: number) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
+  updateColor: (id: string, newColorId: string, newColorName: string) => void;
   clearCart: () => void;
 };
 
@@ -30,6 +33,17 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 const STORAGE_KEY = "astro-craft-cart";
 const EMPTY_CART: CartItem[] = [];
+
+// Identyfikator pozycji w koszyku: ten sam produkt + ten sam wariant (kolor
+// albo identyczna specyfikacja) trafia do jednej linii (ilość rośnie),
+// inny wariant/specyfikacja to osobna linia.
+function computeItemId(item: NewCartItem): string {
+  if (item.colorId) return `${item.productSlug}::color:${item.colorId}`;
+  if (item.specs && item.specs.length > 0) {
+    return `${item.productSlug}::specs:${item.specs.map((spec) => `${spec.label}=${spec.value}`).join("|")}`;
+  }
+  return item.productSlug;
+}
 
 // Module-level store: localStorage is the external system, cachedItems is our
 // in-memory mirror of it. useSyncExternalStore needs getSnapshot() to return a
@@ -87,62 +101,56 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const addItem: CartContextValue["addItem"] = useCallback((item, quantity = 1) => {
+    const id = computeItemId(item);
     const current = getSnapshot();
-    const existing = current.find(
-      (line) => line.productSlug === item.productSlug && line.colorId === item.colorId
-    );
+    const existing = current.find((line) => line.id === id);
     const next = existing
       ? current.map((line) =>
-          line === existing ? { ...line, quantity: line.quantity + quantity } : line
+          line.id === id ? { ...line, quantity: line.quantity + quantity } : line
         )
-      : [...current, { ...item, quantity }];
+      : [...current, { ...item, id, quantity }];
     setCart(next);
   }, []);
 
-  const removeItem: CartContextValue["removeItem"] = useCallback((productSlug, colorId) => {
+  const removeItem: CartContextValue["removeItem"] = useCallback((id) => {
     const current = getSnapshot();
-    setCart(
-      current.filter((line) => !(line.productSlug === productSlug && line.colorId === colorId))
-    );
+    setCart(current.filter((line) => line.id !== id));
   }, []);
 
   const updateQuantity: CartContextValue["updateQuantity"] = useCallback(
-    (productSlug, colorId, quantity) => {
+    (id, quantity) => {
       if (quantity <= 0) {
-        removeItem(productSlug, colorId);
+        removeItem(id);
         return;
       }
       const current = getSnapshot();
-      setCart(
-        current.map((line) =>
-          line.productSlug === productSlug && line.colorId === colorId
-            ? { ...line, quantity }
-            : line
-        )
-      );
+      setCart(current.map((line) => (line.id === id ? { ...line, quantity } : line)));
     },
     [removeItem]
   );
 
   const updateColor: CartContextValue["updateColor"] = useCallback(
-    (productSlug, oldColorId, newColorId, newColorName) => {
-      if (oldColorId === newColorId) return;
+    (id, newColorId, newColorName) => {
       const current = getSnapshot();
-      const line = current.find(
-        (l) => l.productSlug === productSlug && l.colorId === oldColorId
-      );
-      if (!line) return;
+      const line = current.find((l) => l.id === id);
+      if (!line || line.colorId === newColorId) return;
 
-      const target = current.find(
-        (l) => l.productSlug === productSlug && l.colorId === newColorId
-      );
+      const newId = computeItemId({
+        productSlug: line.productSlug,
+        productTitle: line.productTitle,
+        productImage: line.productImage,
+        colorId: newColorId,
+        colorName: newColorName,
+        specs: line.specs,
+      });
+      const target = current.find((l) => l.id === newId);
 
       const next = target
         ? current
-            .filter((l) => l !== line)
-            .map((l) => (l === target ? { ...l, quantity: l.quantity + line.quantity } : l))
+            .filter((l) => l.id !== id)
+            .map((l) => (l.id === newId ? { ...l, quantity: l.quantity + line.quantity } : l))
         : current.map((l) =>
-            l === line ? { ...l, colorId: newColorId, colorName: newColorName } : l
+            l.id === id ? { ...l, id: newId, colorId: newColorId, colorName: newColorName } : l
           );
 
       setCart(next);

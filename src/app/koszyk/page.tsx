@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Mail, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -16,17 +16,26 @@ import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useCart } from "@/lib/cart-context";
+import { useCart, type CartItem } from "@/lib/cart-context";
 import { getProduct } from "@/lib/products";
+
+function describeItem(item: CartItem): string {
+  if (item.colorName) return `kolor: ${item.colorName}`;
+  if (item.specs && item.specs.length > 0) {
+    return item.specs.map((spec) => `${spec.label}: ${spec.value}`).join(", ");
+  }
+  return "";
+}
 
 export default function CartPage() {
   const { items, itemCount, removeItem, updateQuantity, updateColor } = useCart();
 
   const orderMessage = useMemo(() => {
     if (items.length === 0) return "";
-    const lines = items.map(
-      (item) => `- ${item.productTitle} — kolor: ${item.colorName} — ilość: ${item.quantity}`
-    );
+    const lines = items.map((item) => {
+      const description = describeItem(item);
+      return `- ${item.productTitle}${description ? ` — ${description}` : ""} — ilość: ${item.quantity}`;
+    });
     return `Dzień dobry,\n\nchciał(a)bym zamówić:\n${lines.join("\n")}\n\nProszę o kontakt w sprawie realizacji zamówienia.`;
   }, [items]);
 
@@ -58,38 +67,63 @@ export default function CartPage() {
                   const product = getProduct(item.productSlug);
                   const color = product?.colors?.find((c) => c.id === item.colorId);
                   return (
-                    <Card key={`${item.productSlug}-${item.colorId}`}>
+                    <Card key={item.id}>
                       <CardContent className="flex flex-col gap-1">
                         <div className="flex items-center gap-4">
                           <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-lg">
-                            <Image
-                              src={item.productImage}
-                              alt={item.productTitle}
-                              fill
-                              className="object-cover"
-                            />
+                            {item.productImage ? (
+                              <Image
+                                src={item.productImage}
+                                alt={item.productTitle}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="text-muted-foreground flex size-full items-center justify-center">
+                                <Package className="size-6" />
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <Link
-                              href={`/produkt/${item.productSlug}`}
-                              className="font-heading text-sm font-semibold hover:underline"
-                            >
-                              {item.productTitle}
-                            </Link>
-                            <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                              {color && (
-                                <span className="relative size-4 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
-                                  <Image
-                                    src={color.swatch}
-                                    alt=""
-                                    fill
-                                    className="object-cover"
-                                  />
-                                </span>
-                              )}
-                              Kolor: {item.colorName}
-                            </div>
+                            {product ? (
+                              <Link
+                                href={`/produkt/${item.productSlug}`}
+                                className="font-heading text-sm font-semibold hover:underline"
+                              >
+                                {item.productTitle}
+                              </Link>
+                            ) : (
+                              <p className="font-heading text-sm font-semibold">
+                                {item.productTitle}
+                              </p>
+                            )}
+                            {item.colorName ? (
+                              <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                                {color && (
+                                  <span className="relative size-4 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+                                    <Image
+                                      src={color.swatch}
+                                      alt=""
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </span>
+                                )}
+                                Kolor: {item.colorName}
+                              </div>
+                            ) : (
+                              item.specs &&
+                              item.specs.length > 0 && (
+                                <ul className="text-muted-foreground text-xs leading-relaxed">
+                                  {item.specs.map((spec) => (
+                                    <li key={spec.label}>
+                                      {spec.label}: {spec.value}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )
+                            )}
                           </div>
 
                           <div className="flex items-center gap-1">
@@ -98,9 +132,7 @@ export default function CartPage() {
                               variant="outline"
                               size="icon-sm"
                               aria-label="Zmniejsz ilość"
-                              onClick={() =>
-                                updateQuantity(item.productSlug, item.colorId, item.quantity - 1)
-                              }
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
                             >
                               <Minus className="size-3.5" />
                             </Button>
@@ -112,9 +144,7 @@ export default function CartPage() {
                               variant="outline"
                               size="icon-sm"
                               aria-label="Zwiększ ilość"
-                              onClick={() =>
-                                updateQuantity(item.productSlug, item.colorId, item.quantity + 1)
-                              }
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             >
                               <Plus className="size-3.5" />
                             </Button>
@@ -125,14 +155,14 @@ export default function CartPage() {
                             variant="ghost"
                             size="icon-sm"
                             aria-label="Usuń z koszyka"
-                            onClick={() => removeItem(item.productSlug, item.colorId)}
+                            onClick={() => removeItem(item.id)}
                             className="text-destructive"
                           >
                             <Trash2 className="size-4" />
                           </Button>
                         </div>
 
-                        {product?.colors && product.colors.length > 1 && (
+                        {item.colorId && product?.colors && product.colors.length > 1 && (
                           <Accordion multiple={false}>
                             <AccordionItem value="kolor">
                               <AccordionTrigger>Zmień kolor</AccordionTrigger>
@@ -142,12 +172,7 @@ export default function CartPage() {
                                   selectedId={item.colorId}
                                   swatchClassName="size-8"
                                   onSelect={(newColor) =>
-                                    updateColor(
-                                      item.productSlug,
-                                      item.colorId,
-                                      newColor.id,
-                                      newColor.name
-                                    )
+                                    updateColor(item.id, newColor.id, newColor.name)
                                   }
                                 />
                               </AccordionContent>
@@ -169,7 +194,7 @@ export default function CartPage() {
                   </div>
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     Sklep nie obsługuje płatności online — wyślij zapytanie, a przygotuję wycenę
-                    i dostępność dla wybranych kolorów.
+                    i dostępność.
                   </p>
                   <div className="flex flex-col gap-2">
                     <a

@@ -1,12 +1,16 @@
 "use client";
 
-import { Mail } from "lucide-react";
+import { Check, Mail, ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import { ColorSwatchGrid } from "@/components/color-swatch-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useCart } from "@/lib/cart-context";
+import type { ProductColor } from "@/lib/products";
 
 type MaskType = "bahtinov" | "tri-bahtinov";
 type Mounting = "na-tube" | "w-tube";
@@ -21,23 +25,50 @@ const MOUNTING_LABELS: Record<Mounting, string> = {
   "w-tube": "W tubę",
 };
 
+const SECOND_DIMENSION_DEFAULTS: Record<Mounting, string> = {
+  "na-tube": "13",
+  "w-tube": "5",
+};
+
+// Na razie maskę drukujemy tylko w czarnym, klasycznym wykończeniu — pole
+// zostawione w formie wyboru koloru, żeby łatwo dodać kolejne warianty.
+const MASK_COLORS: ProductColor[] = [
+  {
+    id: "czarny",
+    name: "Czarny",
+    finish: "Wykończenie klasyczne",
+    swatch: "/products/szukacz-laserowy/kolory/czarny.png",
+  },
+];
+
 export function MaskConfigurator() {
+  const { addItem } = useCart();
   const [maskType, setMaskType] = useState<MaskType>("bahtinov");
   const [mounting, setMounting] = useState<Mounting>("na-tube");
   const [diameter, setDiameter] = useState("");
   const [hasCentralHole, setHasCentralHole] = useState(false);
   const [centralHoleDiameter, setCentralHoleDiameter] = useState("");
-  const [secondDimension, setSecondDimension] = useState("");
+  const [secondDimension, setSecondDimension] = useState(SECOND_DIMENSION_DEFAULTS["na-tube"]);
+  const [colorId, setColorId] = useState(MASK_COLORS[0].id);
+  const [added, setAdded] = useState(false);
+
+  const selectedColor = MASK_COLORS.find((color) => color.id === colorId) ?? MASK_COLORS[0];
 
   const diameterLabel =
     mounting === "na-tube"
       ? "Średnica zewnętrzna tuby (mm)"
       : "Średnica wewnętrzna tuby (mm)";
 
+  const secondDimensionDefault = SECOND_DIMENSION_DEFAULTS[mounting];
+
   const secondDimensionLabel =
-    mounting === "na-tube"
-      ? "Wysokość kołnierza (mm)"
-      : "Głębokość wsunięcia w tubę (mm)";
+    mounting === "na-tube" ? "Wysokość kołnierza (mm)" : "Głębokość wsunięcia w tubę (mm)";
+
+  function handleMountingChange(value: string) {
+    const nextMounting = value as Mounting;
+    setMounting(nextMounting);
+    setSecondDimension(SECOND_DIMENSION_DEFAULTS[nextMounting]);
+  }
 
   const summaryItems = [
     { label: "Typ maski", value: MASK_TYPE_LABELS[maskType] },
@@ -51,8 +82,25 @@ export function MaskConfigurator() {
           : "tak"
         : "",
     },
-    { label: secondDimensionLabel, value: secondDimension ? `${secondDimension} mm` : "" },
+    {
+      label: secondDimensionLabel,
+      value: `${secondDimension.trim() || secondDimensionDefault} mm`,
+    },
+    { label: "Kolor", value: selectedColor.name },
   ].filter((item) => item.value !== "");
+
+  const canAddToCart = diameter.trim() !== "";
+
+  function handleAddToCart() {
+    if (!canAddToCart) return;
+    addItem({
+      productSlug: "maska-bahtinova",
+      productTitle: `Maska ${MASK_TYPE_LABELS[maskType]} na miarę`,
+      specs: summaryItems,
+    });
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
+  }
 
   return (
     <div className="mx-auto grid max-w-3xl gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-start">
@@ -75,10 +123,7 @@ export function MaskConfigurator() {
 
           <div className="flex flex-col gap-3">
             <Label>Mocowanie</Label>
-            <RadioGroup
-              value={mounting}
-              onValueChange={(value) => setMounting(value as Mounting)}
-            >
+            <RadioGroup value={mounting} onValueChange={handleMountingChange}>
               {(Object.keys(MOUNTING_LABELS) as Mounting[]).map((option) => (
                 <div key={option} className="flex items-center gap-2">
                   <RadioGroupItem value={option} id={`mounting-${option}`} />
@@ -130,16 +175,25 @@ export function MaskConfigurator() {
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="second-dimension">{secondDimensionLabel}</Label>
+            <p className="text-muted-foreground -mt-1 text-xs">
+              Jeśli nie podasz, przyjmiemy domyślnie {secondDimensionDefault} mm.
+            </p>
             <Input
               id="second-dimension"
               type="number"
               min={0}
               step="0.1"
-              placeholder="np. 15"
+              placeholder={secondDimensionDefault}
               value={secondDimension}
               onChange={(event) => setSecondDimension(event.target.value)}
             />
           </div>
+
+          <ColorSwatchGrid
+            colors={MASK_COLORS}
+            selectedId={colorId}
+            onSelect={(color) => setColorId(color.id)}
+          />
         </CardContent>
       </Card>
 
@@ -163,19 +217,42 @@ export function MaskConfigurator() {
           )}
 
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Skontaktuj się mailowo lub przez social media i przekaż tę
-            specyfikację — przygotuję wycenę.
+            Dodaj do koszyka, żeby przesłać tę specyfikację razem z zapytaniem
+            o wycenę — albo napisz bezpośrednio.
           </p>
 
-          <div className="flex flex-col gap-2">
-            <a
-              href="mailto:kontakt@astro-craft.pl"
-              className="from-brand-violet to-brand-periwinkle font-heading inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(124,92,252,0.7)] transition-transform hover:-translate-y-0.5"
-            >
-              <Mail className="size-4" />
-              kontakt@astro-craft.pl
-            </a>
-          </div>
+          <Button
+            type="button"
+            size="lg"
+            onClick={handleAddToCart}
+            disabled={!canAddToCart}
+            className="from-brand-violet to-brand-periwinkle w-full bg-gradient-to-br px-6 py-3 text-white"
+          >
+            {added ? (
+              <>
+                <Check className="size-4" />
+                Dodano do koszyka
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="size-4" />
+                Dodaj do koszyka
+              </>
+            )}
+          </Button>
+          {!canAddToCart && (
+            <p className="text-muted-foreground -mt-3 text-xs">
+              Podaj średnicę tuby, żeby dodać maskę do koszyka.
+            </p>
+          )}
+
+          <a
+            href="mailto:kontakt@astro-craft.pl"
+            className="text-muted-foreground hover:text-foreground inline-flex w-fit items-center gap-2 text-sm font-medium transition-colors"
+          >
+            <Mail className="size-4" />
+            kontakt@astro-craft.pl
+          </a>
         </CardContent>
       </Card>
     </div>
