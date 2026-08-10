@@ -16,7 +16,29 @@ export type Product = {
   features: string[];
   images: string[];
   colors?: ProductColor[];
+  /** Odrośnik: konfigurator wymiarów (średnica tuby + wysokość) zamiast zwykłego wyboru koloru. */
+  requiresDimensions?: boolean;
 };
+
+// Standardowa paleta kolorów/wykończeń — współdzielona przez produkty drukowane na miarę.
+const STANDARD_COLORS: ProductColor[] = [
+  { id: "czarny", name: "Czarny", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/czarny.png" },
+  { id: "bialy", name: "Biały", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/bialy.png" },
+  { id: "kosciana-biel", name: "Kościana Biel", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/kosciana-biel.png" },
+  { id: "szary", name: "Szary", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/szary.png" },
+  { id: "ciemny-braz", name: "Ciemny Brąz", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/ciemny-braz.png" },
+  { id: "jasnoniebieski-przezroczysty", name: "Jasnoniebieski Przeźroczysty", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/jasnoniebieski-przezroczysty.png" },
+  { id: "latte-brazowy", name: "Latte Brązowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/latte-brazowy.png" },
+  { id: "mandarynkowy", name: "Mandarynkowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/mandarynkowy.png" },
+  { id: "morski", name: "Morski", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/morski.png" },
+  { id: "pustynny-bez", name: "Pustynny Beż", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/pustynny-bez.png" },
+  { id: "rozowy", name: "Różowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/rozowy.png" },
+  { id: "czarny-polysk", name: "Czarny Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/czarny-polysk.png" },
+  { id: "galaxy-z-drobinkami", name: "Galaxy z drobinkami", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/galaxy-z-drobinkami.png" },
+  { id: "srebrny-polysk", name: "Srebrny Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/srebrny-polysk.png" },
+  { id: "zloty-polysk", name: "Złoty Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/zloty-polysk.png" },
+  { id: "bialy-polysk", name: "Biały Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/bialy-polysk.png" },
+];
 
 export const PRODUCTS: Product[] = [
   {
@@ -39,24 +61,27 @@ export const PRODUCTS: Product[] = [
       "/products/szukacz-laserowy/03-detal-srubka.jpg",
       "/products/szukacz-laserowy/04-zestaw.jpg",
     ],
-    colors: [
-      { id: "czarny", name: "Czarny", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/czarny.png" },
-      { id: "bialy", name: "Biały", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/bialy.png" },
-      { id: "kosciana-biel", name: "Kościana Biel", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/kosciana-biel.png" },
-      { id: "szary", name: "Szary", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/szary.png" },
-      { id: "ciemny-braz", name: "Ciemny Brąz", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/ciemny-braz.png" },
-      { id: "jasnoniebieski-przezroczysty", name: "Jasnoniebieski Przeźroczysty", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/jasnoniebieski-przezroczysty.png" },
-      { id: "latte-brazowy", name: "Latte Brązowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/latte-brazowy.png" },
-      { id: "mandarynkowy", name: "Mandarynkowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/mandarynkowy.png" },
-      { id: "morski", name: "Morski", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/morski.png" },
-      { id: "pustynny-bez", name: "Pustynny Beż", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/pustynny-bez.png" },
-      { id: "rozowy", name: "Różowy", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/rozowy.png" },
-      { id: "czarny-polysk", name: "Czarny Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/czarny-polysk.png" },
-      { id: "galaxy-z-drobinkami", name: "Galaxy z drobinkami", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/galaxy-z-drobinkami.png" },
-      { id: "srebrny-polysk", name: "Srebrny Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/srebrny-polysk.png" },
-      { id: "zloty-polysk", name: "Złoty Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/zloty-polysk.png" },
-      { id: "bialy-polysk", name: "Biały Połysk", finish: "Wykończenie w połysku", swatch: "/products/szukacz-laserowy/kolory/bialy-polysk.png" },
+    colors: STANDARD_COLORS,
+  },
+  {
+    slug: "odrosnik-na-tube",
+    categorySlug: "akcesoria-do-teleskopow",
+    title: "Odrośnik na tubę, szukacz, itd.",
+    excerpt: "Chroni lustro przed osadzającą się wilgocią i szronem.",
+    description: [
+      "Odrośnik drukowany na miarę pod średnicę Twojej tuby, szukacza lub innego akcesorium — wydłuża osłonę i chroni optykę przed osadzającą się wilgocią i szronem podczas obserwacji.",
     ],
+    features: [
+      "Wymiary dopasowane indywidualnie do średnicy tuby i potrzebnej wysokości.",
+      "Stabilny, mocny montaż.",
+    ],
+    images: [
+      "/products/odrosnik/01-produkt.jpg",
+      "/products/odrosnik/02-w-akcji.jpg",
+      "/products/odrosnik/03-w-akcji-2.jpg",
+    ],
+    colors: STANDARD_COLORS,
+    requiresDimensions: true,
   },
 ];
 

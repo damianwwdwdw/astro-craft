@@ -35,14 +35,15 @@ const STORAGE_KEY = "astro-craft-cart";
 const EMPTY_CART: CartItem[] = [];
 
 // Identyfikator pozycji w koszyku: ten sam produkt + ten sam wariant (kolor
-// albo identyczna specyfikacja) trafia do jednej linii (ilość rośnie),
+// i/albo identyczna specyfikacja) trafia do jednej linii (ilość rośnie),
 // inny wariant/specyfikacja to osobna linia.
 function computeItemId(item: NewCartItem): string {
-  if (item.colorId) return `${item.productSlug}::color:${item.colorId}`;
+  const parts = [item.productSlug];
+  if (item.colorId) parts.push(`color:${item.colorId}`);
   if (item.specs && item.specs.length > 0) {
-    return `${item.productSlug}::specs:${item.specs.map((spec) => `${spec.label}=${spec.value}`).join("|")}`;
+    parts.push(`specs:${item.specs.map((spec) => `${spec.label}=${spec.value}`).join("|")}`);
   }
-  return item.productSlug;
+  return parts.join("::");
 }
 
 // Module-level store: localStorage is the external system, cachedItems is our

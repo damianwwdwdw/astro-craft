@@ -25,11 +25,12 @@ import { useCart, type CartItem } from "@/lib/cart-context";
 import { getProduct } from "@/lib/products";
 
 function describeItem(item: CartItem): string {
-  if (item.colorName) return `kolor: ${item.colorName}`;
+  const parts: string[] = [];
+  if (item.colorName) parts.push(`kolor: ${item.colorName}`);
   if (item.specs && item.specs.length > 0) {
-    return item.specs.map((spec) => `${spec.label}: ${spec.value}`).join(", ");
+    parts.push(item.specs.map((spec) => `${spec.label}: ${spec.value}`).join(", "));
   }
-  return "";
+  return parts.join(", ");
 }
 
 function extractNumber(value: string): number | null {
@@ -185,7 +186,7 @@ export default function CartPage() {
                                 {item.productTitle}
                               </p>
                             )}
-                            {item.colorName ? (
+                            {item.colorName && (
                               <div className="text-muted-foreground flex items-center gap-2 text-xs">
                                 {color && (
                                   <span className="relative size-4 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
@@ -199,17 +200,15 @@ export default function CartPage() {
                                 )}
                                 Kolor: {item.colorName}
                               </div>
-                            ) : (
-                              item.specs &&
-                              item.specs.length > 0 && (
-                                <ul className="text-muted-foreground text-xs leading-relaxed">
-                                  {item.specs.map((spec) => (
-                                    <li key={spec.label}>
-                                      {spec.label}: {spec.value}
-                                    </li>
-                                  ))}
-                                </ul>
-                              )
+                            )}
+                            {item.specs && item.specs.length > 0 && (
+                              <ul className="text-muted-foreground text-xs leading-relaxed">
+                                {item.specs.map((spec) => (
+                                  <li key={spec.label}>
+                                    {spec.label}: {spec.value}
+                                  </li>
+                                ))}
+                              </ul>
                             )}
                           </div>
 

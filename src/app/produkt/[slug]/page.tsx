@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductColorPicker } from "@/components/product-color-picker";
 import { ProductGallery } from "@/components/product-gallery";
+import { RiserConfigurator } from "@/components/riser-configurator";
 import { Footer } from "@/components/sections/footer";
 import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
@@ -80,7 +81,11 @@ export default async function ProductPage({
               </ul>
 
               {product.colors && product.colors.length > 0 && (
-                <ProductColorPicker product={product} />
+                product.requiresDimensions ? (
+                  <RiserConfigurator product={product} />
+                ) : (
+                  <ProductColorPicker product={product} />
+                )
               )}
 
               <a
