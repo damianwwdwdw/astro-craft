@@ -1,9 +1,9 @@
 "use client";
 
-import { Mail, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Mail, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +16,9 @@ import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useCart, type CartItem } from "@/lib/cart-context";
 import { getProduct } from "@/lib/products";
 
@@ -30,11 +33,18 @@ function describeItem(item: CartItem): string {
 export default function CartPage() {
   const { items, itemCount, removeItem, updateQuantity, updateColor } = useCart();
 
+  const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
+  const [orderStatus, setOrderStatus] = useState<"idle" | "sending" | "success" | "error">(
+    "idle"
+  );
+  const [orderError, setOrderError] = useState("");
+
   const orderMessage = useMemo(() => {
     if (items.length === 0) return "";
     const lines = items.map((item) => {
-      const description = describeItem(item);
-      return `- ${item.productTitle}${description ? ` — ${description}` : ""} — ilość: ${item.quantity}`;
+      const desc = describeItem(item);
+      return `- ${item.productTitle}${desc ? ` — ${desc}` : ""} — ilość: ${item.quantity}`;
     });
     return `Dzień dobry,\n\nchciał(a)bym zamówić:\n${lines.join("\n")}\n\nProszę o kontakt w sprawie realizacji zamówienia.`;
   }, [items]);
@@ -42,6 +52,44 @@ export default function CartPage() {
   const mailtoHref = `mailto:kontakt@astro-craft.pl?subject=${encodeURIComponent(
     "Zamówienie ze strony — koszyk"
   )}&body=${encodeURIComponent(orderMessage)}`;
+
+  const busy = orderStatus === "sending";
+
+  async function handleSendOrder(event: FormEvent) {
+    event.preventDefault();
+    if (!email.trim() || items.length === 0) return;
+
+    setOrderStatus("sending");
+    setOrderError("");
+
+    try {
+      const response = await fetch("/api/cart-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          description,
+          items: items.map((item) => ({
+            title: item.productTitle,
+            details: describeItem(item),
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setOrderStatus("error");
+        setOrderError(data.error ?? "Nie udało się wysłać zapytania.");
+        return;
+      }
+
+      setOrderStatus("success");
+    } catch {
+      setOrderStatus("error");
+      setOrderError("Wystąpił błąd. Spróbuj ponownie.");
+    }
+  }
 
   return (
     <>
@@ -192,19 +240,70 @@ export default function CartPage() {
                     <span className="text-muted-foreground">Liczba sztuk</span>
                     <span className="font-medium">{itemCount}</span>
                   </div>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Sklep nie obsługuje płatności online — wyślij zapytanie, a przygotuję wycenę
-                    i dostępność.
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <a
-                      href={mailtoHref}
-                      className="from-brand-violet to-brand-periwinkle font-heading inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_-10px_rgba(124,92,252,0.7)] transition-transform hover:-translate-y-0.5"
-                    >
-                      <Mail className="size-4" />
-                      Wyślij zapytanie mailem
-                    </a>
-                  </div>
+
+                  {orderStatus === "success" ? (
+                    <div className="flex flex-col items-center gap-3 py-4 text-center">
+                      <CheckCircle2 className="text-brand-violet size-8" />
+                      <p className="font-heading text-sm font-semibold">Zapytanie wysłane</p>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        Dziękuję za zapytanie — odezwę się najszybciej jak to możliwe.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSendOrder} className="flex flex-col gap-5">
+                      <p className="text-muted-foreground text-sm leading-relaxed">
+                        Sklep nie obsługuje płatności online — podaj e-mail, a przygotuję wycenę
+                        i dostępność.
+                      </p>
+
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="cart-email">E-mail *</Label>
+                        <Input
+                          id="cart-email"
+                          type="email"
+                          required
+                          value={email}
+                          disabled={busy}
+                          onChange={(event) => setEmail(event.target.value)}
+                          placeholder="np. jan@example.com"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="cart-description">Dodatkowy opis (opcjonalnie)</Label>
+                        <Textarea
+                          id="cart-description"
+                          value={description}
+                          disabled={busy}
+                          onChange={(event) => setDescription(event.target.value)}
+                          placeholder="Dodatkowe informacje do zamówienia..."
+                        />
+                      </div>
+
+                      {orderStatus === "error" && (
+                        <div className="text-destructive flex items-center gap-2 text-sm">
+                          <AlertCircle className="size-4 shrink-0" />
+                          {orderError}
+                        </div>
+                      )}
+
+                      <Button
+                        type="submit"
+                        disabled={busy || !email.trim()}
+                        className="from-brand-violet to-brand-periwinkle w-full bg-gradient-to-br px-6 py-3 text-white"
+                      >
+                        <Mail className="size-4" />
+                        {busy ? "Wysyłanie..." : "Wyślij zapytanie"}
+                      </Button>
+
+                      <a
+                        href={mailtoHref}
+                        className="text-muted-foreground hover:text-foreground text-center text-xs transition-colors"
+                      >
+                        lub napisz bezpośrednio na kontakt@astro-craft.pl
+                      </a>
+                    </form>
+                  )}
                 </CardContent>
               </Card>
             </div>

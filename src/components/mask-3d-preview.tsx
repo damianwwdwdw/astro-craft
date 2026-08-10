@@ -16,7 +16,7 @@ const CX = VIEW_W / 2;
 const OUTER_R_PX = 130;
 const TILT = 0.64;
 const FLANGE_RADIUS_RATIO = 1.12;
-const FLANGE_THICKNESS_PX = 14;
+const FLANGE_THICKNESS_MM = 2;
 const MIN_WALL_PX = 3;
 const MAX_WALL_PX = OUTER_R_PX * 1.3;
 
@@ -25,6 +25,8 @@ const COL_RIM = "#0C447C";
 const COL_WALL = "#378ADD";
 const COL_WALL_DARK = "#185FA5";
 const COL_SLOT = "#042C53";
+const COL_COLLAR = "#94A3B8";
+const COL_COLLAR_RIM = "#475569";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -158,8 +160,8 @@ export function MaskPreview({
         <path
           d={wallPath(rx, ry, rimY, baseY)}
           transform={`translate(${CX} 0)`}
-          fill={COL_WALL}
-          stroke={COL_RIM}
+          fill={COL_COLLAR}
+          stroke={COL_COLLAR_RIM}
           strokeWidth={1}
         />
         <g transform={`translate(${CX} ${baseY}) scale(1 ${TILT})`}>
@@ -171,7 +173,7 @@ export function MaskPreview({
           rx={rx}
           ry={ry}
           fill="none"
-          stroke={COL_RIM}
+          stroke={COL_COLLAR_RIM}
           strokeWidth={2}
         />
       </>
@@ -180,7 +182,8 @@ export function MaskPreview({
     baseY = 150;
     const flangeRx = rx * FLANGE_RADIUS_RATIO;
     const flangeRy = flangeRx * TILT;
-    const flangeBottomY = baseY + FLANGE_THICKNESS_PX;
+    const flangeThicknessPx = clamp(FLANGE_THICKNESS_MM * scale, MIN_WALL_PX, MAX_WALL_PX);
+    const flangeBottomY = baseY + flangeThicknessPx;
     const topY = baseY - extrusionPx;
     extrusion = (
       <>
