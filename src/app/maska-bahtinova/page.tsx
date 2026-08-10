@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MaskConfigurator } from "@/components/mask-configurator";
+import { MaskPreview } from "@/components/mask-3d-preview";
 import { CONTAINER, SectionHeading } from "@/components/sections/shared";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/sections/footer";
@@ -29,6 +30,16 @@ export default function MaskaBahtinovaPage() {
             <ArrowLeft className="size-4" />
             Powrót
           </Button>
+
+          <div className="mx-auto mb-6 w-full max-w-[280px]">
+            <MaskPreview
+              maskType="bahtinov"
+              mounting="na-tube"
+              diameterMM={200}
+              secondDimensionMM={13}
+              holeDiameterMM={null}
+            />
+          </div>
 
           <SectionHeading
             eyebrow="Sklep"

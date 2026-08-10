@@ -17,7 +17,7 @@ export type MaskType = "bahtinov" | "tri-bahtinov";
 export type Mounting = "na-tube" | "w-tube";
 
 const DEFAULT_PREVIEW_DIAMETER_MM = 200;
-const DEFAULT_HOLE_RATIO = 0.25;
+export const DEFAULT_HOLE_RATIO = 0.25;
 const DIAMETER_MIN_MM = 30;
 const DIAMETER_MAX_MM = 250;
 

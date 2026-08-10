@@ -11,6 +11,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ColorSwatchGrid } from "@/components/color-swatch-grid";
+import { DEFAULT_HOLE_RATIO, type MaskType, type Mounting } from "@/components/mask-configurator";
+import { MaskPreview, type MaskPreviewProps } from "@/components/mask-3d-preview";
 import { Footer } from "@/components/sections/footer";
 import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
@@ -28,6 +30,36 @@ function describeItem(item: CartItem): string {
     return item.specs.map((spec) => `${spec.label}: ${spec.value}`).join(", ");
   }
   return "";
+}
+
+function extractNumber(value: string): number | null {
+  const match = value.match(/[\d.]+/);
+  if (!match) return null;
+  const num = Number(match[0]);
+  return Number.isFinite(num) ? num : null;
+}
+
+function getMaskPreviewProps(item: CartItem): MaskPreviewProps | null {
+  if (item.productSlug !== "maska-bahtinova" || !item.specs) return null;
+  const specMap = new Map(item.specs.map((spec) => [spec.label, spec.value]));
+
+  const maskType: MaskType = specMap.get("Typ maski")?.includes("Tri") ? "tri-bahtinov" : "bahtinov";
+  const mounting: Mounting = specMap.get("Mocowanie")?.includes("W tubę") ? "w-tube" : "na-tube";
+
+  const diameterEntry = item.specs.find((spec) => spec.label.startsWith("Średnica"));
+  const diameterMM = diameterEntry ? extractNumber(diameterEntry.value) : null;
+  if (!diameterMM) return null;
+
+  const secondDimensionEntry = item.specs.find(
+    (spec) => spec.label.startsWith("Wysokość kołnierza") || spec.label.startsWith("Głębokość wsunięcia")
+  );
+  const secondDimensionMM = secondDimensionEntry ? extractNumber(secondDimensionEntry.value) : null;
+  if (!secondDimensionMM) return null;
+
+  const holeValue = specMap.get("Otwór centralny");
+  const holeDiameterMM = holeValue ? extractNumber(holeValue) ?? diameterMM * DEFAULT_HOLE_RATIO : null;
+
+  return { maskType, mounting, diameterMM, secondDimensionMM, holeDiameterMM };
 }
 
 export default function CartPage() {
@@ -114,24 +146,31 @@ export default function CartPage() {
                 {items.map((item) => {
                   const product = getProduct(item.productSlug);
                   const color = product?.colors?.find((c) => c.id === item.colorId);
+                  const maskPreviewProps = getMaskPreviewProps(item);
                   return (
                     <Card key={item.id}>
                       <CardContent className="flex flex-col gap-1">
                         <div className="flex items-center gap-4">
-                          <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-lg">
-                            {item.productImage ? (
-                              <Image
-                                src={item.productImage}
-                                alt={item.productTitle}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="text-muted-foreground flex size-full items-center justify-center">
-                                <Package className="size-6" />
-                              </div>
-                            )}
-                          </div>
+                          {maskPreviewProps ? (
+                            <div className="w-24 shrink-0">
+                              <MaskPreview {...maskPreviewProps} />
+                            </div>
+                          ) : (
+                            <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-lg">
+                              {item.productImage ? (
+                                <Image
+                                  src={item.productImage}
+                                  alt={item.productTitle}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="text-muted-foreground flex size-full items-center justify-center">
+                                  <Package className="size-6" />
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                           <div className="flex min-w-0 flex-1 flex-col gap-1">
                             {product ? (
