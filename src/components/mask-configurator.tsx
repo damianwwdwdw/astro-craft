@@ -18,6 +18,8 @@ export type Mounting = "na-tube" | "w-tube";
 
 const DEFAULT_PREVIEW_DIAMETER_MM = 200;
 const DEFAULT_HOLE_RATIO = 0.25;
+const DIAMETER_MIN_MM = 30;
+const DIAMETER_MAX_MM = 250;
 
 const MASK_TYPE_LABELS: Record<MaskType, string> = {
   bahtinov: "Bahtinov",
@@ -77,6 +79,14 @@ export function MaskConfigurator() {
       : previewDiameterMM * DEFAULT_HOLE_RATIO
     : null;
 
+  const diameterError =
+    diameter.trim() !== "" &&
+    (!Number.isFinite(parsedDiameter) ||
+      parsedDiameter < DIAMETER_MIN_MM ||
+      parsedDiameter > DIAMETER_MAX_MM)
+      ? `Podaj wartość z zakresu ${DIAMETER_MIN_MM}-${DIAMETER_MAX_MM} mm.`
+      : "";
+
   const diameterLabel =
     mounting === "na-tube"
       ? "Średnica zewnętrzna tuby (mm)"
@@ -112,7 +122,7 @@ export function MaskConfigurator() {
     { label: "Kolor", value: selectedColor.name },
   ].filter((item) => item.value !== "");
 
-  const canAddToCart = diameter.trim() !== "";
+  const canAddToCart = diameter.trim() !== "" && diameterError === "";
 
   function handleAddToCart() {
     if (!canAddToCart) return;
@@ -161,12 +171,17 @@ export function MaskConfigurator() {
             <Input
               id="diameter"
               type="number"
-              min={0}
+              min={DIAMETER_MIN_MM}
+              max={DIAMETER_MAX_MM}
               step="0.1"
               placeholder="np. 203"
               value={diameter}
+              aria-invalid={diameterError !== ""}
               onChange={(event) => setDiameter(event.target.value)}
             />
+            {diameterError && (
+              <p className="text-destructive text-xs">{diameterError}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -272,7 +287,7 @@ export function MaskConfigurator() {
               </>
             )}
           </Button>
-          {!canAddToCart && (
+          {!canAddToCart && diameter.trim() === "" && (
             <p className="text-muted-foreground -mt-3 text-xs">
               Podaj średnicę tuby, żeby dodać maskę do koszyka.
             </p>
