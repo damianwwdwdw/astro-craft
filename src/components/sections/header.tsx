@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { href: "/sklep", label: "Sklep" },
   { href: "/#o-nas", label: "O mnie" },
   { href: "/#proces", label: "Jak to działa" },
-  { href: "/#galeria", label: "Realizacje" },
+  { href: "/#galeria", label: "Galeria" },
 ];
 
 export function Header() {
