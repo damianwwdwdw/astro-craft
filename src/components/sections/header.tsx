@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Mail, Menu, ShoppingCart, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,7 +33,13 @@ export function Header() {
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
 
-          <Link href="/" className="bg-brand-paper flex items-center rounded-lg px-2 py-1">
+          <Link
+            href="/"
+            className="flex items-center"
+            onClick={() => {
+              if (typeof window !== "undefined") window.scrollTo({ top: 0 });
+            }}
+          >
             <Image src="/logo.png" alt="Astro Craft" width={200} height={128} className="h-9 w-auto" priority />
           </Link>
         </div>
@@ -63,8 +69,12 @@ export function Header() {
               </span>
             )}
           </Link>
-          <Button nativeButton={false} render={<Link href="/#kontakt" />}>
-            Skontaktuj się
+          <Button
+            size="icon"
+            nativeButton={false}
+            render={<Link href="/#kontakt" aria-label="Skontaktuj się" />}
+          >
+            <Mail className="size-4" />
           </Button>
         </div>
       </div>

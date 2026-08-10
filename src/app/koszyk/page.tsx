@@ -1,6 +1,16 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Mail, Minus, Package, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Mail,
+  Minus,
+  Package,
+  Plus,
+  ShoppingCart,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type FormEvent } from "react";
@@ -129,6 +139,17 @@ export default function CartPage() {
       <Header />
       <main className="flex-1">
         <section className={`${CONTAINER} py-20`}>
+          <Button
+            variant="ghost"
+            size="sm"
+            nativeButton={false}
+            render={<Link href="/sklep" />}
+            className="mb-8"
+          >
+            <ArrowLeft className="size-4" />
+            Przejdź do sklepu
+          </Button>
+
           <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Koszyk</h1>
 
           {items.length === 0 ? (
