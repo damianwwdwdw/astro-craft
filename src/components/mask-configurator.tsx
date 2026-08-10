@@ -3,6 +3,7 @@
 import { Check, Mail, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { ColorSwatchGrid } from "@/components/color-swatch-grid";
+import { MaskPreview } from "@/components/mask-3d-preview";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useCart } from "@/lib/cart-context";
 import type { ProductColor } from "@/lib/products";
 
-type MaskType = "bahtinov" | "tri-bahtinov";
-type Mounting = "na-tube" | "w-tube";
+export type MaskType = "bahtinov" | "tri-bahtinov";
+export type Mounting = "na-tube" | "w-tube";
+
+const DEFAULT_PREVIEW_DIAMETER_MM = 200;
+const DEFAULT_HOLE_RATIO = 0.25;
 
 const MASK_TYPE_LABELS: Record<MaskType, string> = {
   bahtinov: "Bahtinov",
@@ -53,6 +57,25 @@ export function MaskConfigurator() {
   const [added, setAdded] = useState(false);
 
   const selectedColor = MASK_COLORS.find((color) => color.id === colorId) ?? MASK_COLORS[0];
+
+  const parsedDiameter = Number(diameter);
+  const previewDiameterMM =
+    Number.isFinite(parsedDiameter) && parsedDiameter > 0
+      ? parsedDiameter
+      : DEFAULT_PREVIEW_DIAMETER_MM;
+
+  const parsedSecondDimension = Number(secondDimension.trim() || SECOND_DIMENSION_DEFAULTS[mounting]);
+  const previewSecondDimensionMM =
+    Number.isFinite(parsedSecondDimension) && parsedSecondDimension > 0
+      ? parsedSecondDimension
+      : Number(SECOND_DIMENSION_DEFAULTS[mounting]);
+
+  const parsedHoleDiameter = Number(centralHoleDiameter);
+  const previewHoleDiameterMM = hasCentralHole
+    ? Number.isFinite(parsedHoleDiameter) && parsedHoleDiameter > 0
+      ? parsedHoleDiameter
+      : previewDiameterMM * DEFAULT_HOLE_RATIO
+    : null;
 
   const diameterLabel =
     mounting === "na-tube"
@@ -199,6 +222,15 @@ export function MaskConfigurator() {
 
       <Card className="bg-card/60 lg:sticky lg:top-24">
         <CardContent className="flex flex-col gap-5">
+          <div className="border-border -mx-(--card-spacing) -mt-(--card-spacing) border-b px-(--card-spacing) pt-(--card-spacing) pb-5">
+            <MaskPreview
+              maskType={maskType}
+              mounting={mounting}
+              diameterMM={previewDiameterMM}
+              secondDimensionMM={previewSecondDimensionMM}
+              holeDiameterMM={previewHoleDiameterMM}
+            />
+          </div>
           <p className="font-heading font-semibold">Podsumowanie</p>
 
           {summaryItems.length === 0 ? (
