@@ -8,6 +8,7 @@ export type MaskPreviewProps = {
   diameterMM: number;
   secondDimensionMM: number;
   holeDiameterMM: number | null;
+  className?: string;
 };
 
 const VIEW_W = 400;
@@ -137,6 +138,7 @@ export function MaskPreview({
   diameterMM,
   secondDimensionMM,
   holeDiameterMM,
+  className = "h-auto w-full",
 }: MaskPreviewProps) {
   const scale = OUTER_R_PX / (diameterMM / 2);
   const rx = OUTER_R_PX;
@@ -236,7 +238,7 @@ export function MaskPreview({
   }
 
   return (
-    <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="h-auto w-full" role="img" aria-label={label}>
+    <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className={className} role="img" aria-label={label}>
       {extrusion}
     </svg>
   );

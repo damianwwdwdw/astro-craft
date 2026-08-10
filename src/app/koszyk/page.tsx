@@ -151,10 +151,10 @@ export default function CartPage() {
                   return (
                     <Card key={item.id}>
                       <CardContent className="flex flex-col gap-1">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-start gap-4">
                           {maskPreviewProps ? (
-                            <div className="w-24 shrink-0">
-                              <MaskPreview {...maskPreviewProps} />
+                            <div className="h-16 w-24 shrink-0">
+                              <MaskPreview {...maskPreviewProps} className="h-full w-full" />
                             </div>
                           ) : (
                             <div className="bg-muted relative size-16 shrink-0 overflow-hidden rounded-lg">
