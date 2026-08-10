@@ -9,8 +9,8 @@ import { CONTAINER } from "@/components/sections/shared";
 import { useCart } from "@/lib/cart-context";
 
 const NAV_LINKS = [
-  { href: "/#o-nas", label: "O mnie" },
   { href: "/sklep", label: "Sklep" },
+  { href: "/#o-nas", label: "O mnie" },
   { href: "/#proces", label: "Jak to działa" },
   { href: "/#galeria", label: "Realizacje" },
 ];
@@ -57,6 +57,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/sklep"
+            className="text-muted-foreground hover:text-foreground flex h-9 items-center rounded-lg px-2 text-sm font-medium md:hidden"
+          >
+            Sklep
+          </Link>
           <Link
             href="/koszyk"
             aria-label="Koszyk"
