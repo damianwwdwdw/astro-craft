@@ -137,9 +137,19 @@ export function ShopCatalog() {
             const category = item.category;
             return category.href ? (
               <Link key={item.key} href={category.href} className="block">
-                <Card className="hover:ring-brand-violet hover:bg-brand-violet/10 h-full transition-colors hover:-translate-y-0.5">
-                  <CardContent className="flex flex-col gap-3">
-                    <category.icon className="text-brand-periwinkle size-6" />
+                <Card className="hover:ring-brand-violet hover:bg-brand-violet/10 h-full overflow-hidden py-0 transition-colors hover:-translate-y-0.5">
+                  {category.image && (
+                    <div className="bg-muted relative aspect-[4/3] w-full">
+                      <Image
+                        src={category.image}
+                        alt={category.title}
+                        fill
+                        className="object-cover object-[center_38%]"
+                      />
+                    </div>
+                  )}
+                  <CardContent className="flex flex-col gap-3 py-4">
+                    {!category.image && <category.icon className="text-brand-periwinkle size-6" />}
                     <p className="font-heading font-semibold">{category.title}</p>
                     <p className="text-muted-foreground text-sm leading-relaxed">
                       {category.description}

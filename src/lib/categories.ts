@@ -15,6 +15,8 @@ export type Category = {
   icon: LucideIcon;
   /** Only set for categories with their own dedicated page (e.g. the mask configurator). */
   href?: string;
+  /** Optional zdjęcie pokazywane na karcie kategorii zamiast samej ikony. */
+  image?: string;
 };
 
 export const CATEGORIES: Category[] = [
@@ -48,6 +50,7 @@ export const CATEGORIES: Category[] = [
     title: "Maski Bahtinova i Tri-Bahtinova",
     description: "Zamów maskę dopasowaną do Twoich potrzeb.",
     href: "/maska-bahtinova",
+    image: "/products/maska-bahtinova/01-produkt.jpg",
   },
   {
     slug: "projekty-na-zamowienie",
@@ -55,5 +58,6 @@ export const CATEGORIES: Category[] = [
     title: "Projekty na zamówienie",
     description: "Indywidualny model pod Twój sprzęt i pomysł.",
     href: "/projekty-na-zamowienie",
+    image: "/products/projekty-na-zamowienie/01-produkt.jpg",
   },
 ];
