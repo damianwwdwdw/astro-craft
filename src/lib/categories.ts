@@ -4,6 +4,7 @@ import {
   Focus,
   LayoutGrid,
   Puzzle,
+  Sparkles,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -43,6 +44,12 @@ export const CATEGORIES: Category[] = [
     icon: Puzzle,
     title: "Elementy zamienne",
     description: "Zagubione lub zużyte części odtworzone na miarę.",
+  },
+  {
+    slug: "gadzety",
+    icon: Sparkles,
+    title: "Gadżety",
+    description: "Drobne akcesoria i gadżety dla miłośników astronomii.",
   },
   {
     slug: "maski-bahtinova",

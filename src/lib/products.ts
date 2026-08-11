@@ -18,6 +18,8 @@ export type Product = {
   colors?: ProductColor[];
   /** Odrośnik: konfigurator wymiarów (średnica tuby + wysokość) zamiast zwykłego wyboru koloru. */
   requiresDimensions?: boolean;
+  /** Starship + Booster: wybór elementów (checkboxy) zamiast koloru. */
+  stageOptions?: { id: string; label: string }[];
 };
 
 // Standardowa paleta kolorów/wykończeń — współdzielona przez produkty drukowane na miarę.
@@ -82,6 +84,33 @@ export const PRODUCTS: Product[] = [
     ],
     colors: STANDARD_COLORS,
     requiresDimensions: true,
+  },
+  {
+    slug: "starship-booster",
+    categorySlug: "gadzety",
+    title: "Starship + Booster w skali 1:200",
+    excerpt: "Model rakiety SpaceX Starship i boostera Super Heavy w skali 1:200.",
+    description: [
+      "Model w skali 1:200. Przy zakupie pierwszego i drugiego stopnia (Booster + Starship) w komplecie dorzucam pierścień łączący.",
+    ],
+    features: [
+      "Dwie części do wyboru osobno lub razem: Starship i Booster (Super Heavy), obie w skali 1:200.",
+      "Przy zakupie obu stopni razem w zestawie gratis pierścień łączący.",
+    ],
+    images: [
+      "/products/starship-booster/01-produkt.jpg",
+      "/products/starship-booster/02-produkt.jpg",
+      "/products/starship-booster/03-detal.jpg",
+      "/products/starship-booster/04-detal.jpg",
+      "/products/starship-booster/05-detal.jpg",
+      "/products/starship-booster/06-detal.jpg",
+      "/products/starship-booster/07-super-heavy.jpg",
+      "/products/starship-booster/08-detal.jpg",
+    ],
+    stageOptions: [
+      { id: "starship", label: "Starship skala 1:200" },
+      { id: "booster", label: "Booster skala 1:200" },
+    ],
   },
 ];
 

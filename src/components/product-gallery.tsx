@@ -14,7 +14,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
           src={images[active]}
           alt={title}
           fill
-          className="object-cover"
+          className="object-contain"
           priority
         />
       </div>
@@ -32,7 +32,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
                 active === index ? "ring-brand-violet" : "ring-transparent hover:ring-brand-lavender/40"
               )}
             >
-              <Image src={src} alt="" fill className="object-cover" />
+              <Image src={src} alt="" fill className="object-contain" />
             </button>
           ))}
         </div>
