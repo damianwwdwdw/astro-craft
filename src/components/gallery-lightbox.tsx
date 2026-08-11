@@ -14,6 +14,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
   const [active, setActive] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const thumbRailRef = useRef<HTMLDivElement | null>(null);
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const touchStartX = useRef<number | null>(null);
 
   function goPrev() {
@@ -39,6 +40,14 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
   function scrollThumbs(direction: 1 | -1) {
     thumbRailRef.current?.scrollBy({ left: direction * THUMB_SCROLL_PX, behavior: "smooth" });
   }
+
+  useEffect(() => {
+    thumbRefs.current[active]?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, [active]);
 
   useEffect(() => {
     if (lightboxIndex === null) return;
@@ -120,6 +129,9 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
             {images.map((image, index) => (
               <button
                 key={image.src}
+                ref={(el) => {
+                  thumbRefs.current[index] = el;
+                }}
                 type="button"
                 onClick={() => setActive(index)}
                 aria-label={`Pokaż: ${image.alt}`}
