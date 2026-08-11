@@ -120,7 +120,7 @@ export function ShopCatalog() {
                         src={item.product.images[0]}
                         alt={item.product.title}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                       />
                     </div>
                     <CardContent className="flex flex-col gap-2 py-4">
