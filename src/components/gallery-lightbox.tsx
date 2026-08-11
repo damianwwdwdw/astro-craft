@@ -42,11 +42,15 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
   }
 
   useEffect(() => {
-    thumbRefs.current[active]?.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest",
-    });
+    const rail = thumbRailRef.current;
+    const thumb = thumbRefs.current[active];
+    if (!rail || !thumb) return;
+    // Scroll only the thumbnail rail itself (not scrollIntoView, which can also
+    // scroll the page if the gallery section isn't fully in view yet).
+    const railRect = rail.getBoundingClientRect();
+    const thumbRect = thumb.getBoundingClientRect();
+    const offset = thumbRect.left - railRect.left - (railRect.width - thumbRect.width) / 2;
+    rail.scrollBy({ left: offset, behavior: "smooth" });
   }, [active]);
 
   useEffect(() => {
