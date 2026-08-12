@@ -56,8 +56,8 @@
 
 :root {
   /* Astro Craft brand palette (matches astro-craft.pl) */
-  --brand-bg-deep: #0a0a1a;
-  --brand-bg-mid: #14103a;
+  --brand-bg-deep: #060607;
+  --brand-bg-mid: #14100c;
   --brand-violet: #7c5cfc;
   --brand-periwinkle: #6d7fe0;
   --brand-lavender: #c9bfff;
@@ -67,15 +67,15 @@
 
   --background: var(--brand-bg-deep);
   --foreground: var(--brand-paper);
-  --card: #14103a;
+  --card: #141210;
   --card-foreground: var(--brand-paper);
-  --popover: #171236;
+  --popover: #19160f;
   --popover-foreground: var(--brand-paper);
   --primary: var(--brand-violet);
   --primary-foreground: var(--brand-paper);
   --secondary: var(--brand-periwinkle);
   --secondary-foreground: var(--brand-paper);
-  --muted: #171236;
+  --muted: #19160f;
   --muted-foreground: var(--brand-muted);
   --accent: var(--brand-periwinkle);
   --accent-foreground: var(--brand-paper);
@@ -106,8 +106,8 @@
   body {
     @apply text-foreground;
     background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124, 92, 252, 0.35), transparent 60%),
-      radial-gradient(ellipse 60% 40% at 85% 90%, rgba(109, 127, 224, 0.25), transparent 60%),
+      radial-gradient(ellipse 90% 55% at 50% 100%, rgba(180, 140, 90, 0.14), transparent 60%),
+      radial-gradient(ellipse 55% 35% at 10% 0%, rgba(90, 100, 120, 0.1), transparent 60%),
       linear-gradient(180deg, var(--brand-bg-deep) 0%, var(--brand-bg-mid) 100%);
     background-attachment: fixed;
   }
