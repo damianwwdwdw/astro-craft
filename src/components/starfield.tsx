@@ -57,14 +57,6 @@ export function Starfield() {
       aria-hidden="true"
     >
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 55% at 50% 100%, rgba(180, 140, 90, 0.14), transparent 60%)," +
-            "radial-gradient(ellipse 55% 35% at 10% 0%, rgba(90, 100, 120, 0.1), transparent 60%)",
-        }}
-      />
-      <div
         ref={milkyWayRef}
         className="absolute"
         style={{

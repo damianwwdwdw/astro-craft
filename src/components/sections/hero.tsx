@@ -7,13 +7,22 @@ import { CONTAINER } from "@/components/sections/shared";
 export function Hero() {
   return (
     <section className={`${CONTAINER} flex flex-col items-center gap-10 pt-20 pb-24 text-center sm:pt-28`}>
-      <div className="relative flex aspect-square w-full max-w-[280px] items-center justify-center overflow-hidden">
+      <div className="relative flex aspect-square w-full max-w-[280px] items-center justify-center">
         <div className="border-brand-lavender/30 absolute inset-0 rounded-full border border-dashed" />
 
-        {/* Star orbiting the ring */}
-        <div className="animate-orbit absolute inset-0">
-          <div className="animate-orbit-counter absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <OrbitStar />
+        {/*
+          Clip buffer for the rotating orbit layer below: without it, the
+          square wrapper's rotated corners poke past the circle and widen
+          the page (see .animate-orbit-track history). The buffer is inset
+          -3.5 (14px) beyond the ring so it never clips the 24px star itself
+          at the 12/3/6/9 o'clock points, where the star sits centered right
+          on the ring's edge.
+        */}
+        <div className="absolute -inset-3.5 overflow-hidden">
+          <div className="animate-orbit absolute inset-3.5">
+            <div className="animate-orbit-counter absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <OrbitStar />
+            </div>
           </div>
         </div>
 
