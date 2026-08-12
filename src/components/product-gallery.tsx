@@ -66,7 +66,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
             type="button"
             aria-label="Zamknij"
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute top-4 right-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
           >
             <X className="size-5" />
           </button>
@@ -79,7 +79,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
                 event.stopPropagation();
                 setActive((current) => (current - 1 + images.length) % images.length);
               }}
-              className="absolute left-2 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-6"
+              className="absolute left-2 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:left-6"
             >
               <ChevronLeft className="size-6" />
             </button>
@@ -97,7 +97,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
                 event.stopPropagation();
                 setActive((current) => (current + 1) % images.length);
               }}
-              className="absolute right-2 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6"
+              className="absolute right-2 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 sm:right-6"
             >
               <ChevronRight className="size-6" />
             </button>

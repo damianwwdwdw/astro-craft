@@ -7,7 +7,7 @@ import { CONTAINER } from "@/components/sections/shared";
 export function Hero() {
   return (
     <section className={`${CONTAINER} flex flex-col items-center gap-10 pt-20 pb-24 text-center sm:pt-28`}>
-      <div className="relative flex aspect-square w-full max-w-[280px] items-center justify-center">
+      <div className="relative flex aspect-square w-full max-w-[280px] items-center justify-center overflow-hidden">
         <div className="border-brand-lavender/30 absolute inset-0 rounded-full border border-dashed" />
 
         {/* Star orbiting the ring */}
