@@ -116,6 +116,8 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
           </button>
         </div>
 
+        <p className="text-muted-foreground text-center text-sm">{images[active].alt}</p>
+
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -188,13 +190,19 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
             <ChevronLeft className="size-6" />
           </button>
 
-          <div className="relative h-[80vh] w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
-            <Image
-              src={images[lightboxIndex].src}
-              alt={images[lightboxIndex].alt}
-              fill
-              className="object-contain"
-            />
+          <div
+            className="flex h-[80vh] w-full max-w-4xl flex-col gap-3"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="relative min-h-0 flex-1">
+              <Image
+                src={images[lightboxIndex].src}
+                alt={images[lightboxIndex].alt}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <p className="shrink-0 text-center text-sm text-white/80">{images[lightboxIndex].alt}</p>
           </div>
 
           <button
