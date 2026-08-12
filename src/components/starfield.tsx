@@ -1,6 +1,4 @@
-"use client";
-
-import { useEffect, useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 function seededRandom(seed: number) {
   const x = Math.sin(seed * 999) * 10000;
@@ -24,32 +22,15 @@ const LAYERS = [
 ];
 
 const MILKY_WAY_ROTATION_DEG = -18;
-const PARALLAX_FACTOR = -0.15;
 
+/**
+ * Entirely static and pinned to the viewport (position: fixed, not
+ * background-attachment: fixed — that combination is what caused mobile
+ * Chrome to tear/leave stale patches while scrolling). Page content scrolls
+ * normally on top; this backdrop never moves, so there's no scroll-position
+ * seam to render.
+ */
 export function Starfield() {
-  const milkyWayRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
-
-    let ticking = false;
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const el = milkyWayRef.current;
-        if (el) {
-          el.style.transform = `rotate(${MILKY_WAY_ROTATION_DEG}deg) translateY(${window.scrollY * PARALLAX_FACTOR}px)`;
-        }
-        ticking = false;
-      });
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
     <div
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden will-change-transform"
@@ -57,7 +38,15 @@ export function Starfield() {
       aria-hidden="true"
     >
       <div
-        ref={milkyWayRef}
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 55% at 50% 0%, rgba(90, 100, 120, 0.12), transparent 70%)," +
+            "radial-gradient(ellipse 70% 55% at 50% 100%, rgba(180, 140, 90, 0.16), transparent 70%)," +
+            "linear-gradient(180deg, var(--brand-bg-deep) 0%, var(--brand-bg-mid) 100%)",
+        }}
+      />
+      <div
         className="absolute"
         style={{
           left: "-40%",

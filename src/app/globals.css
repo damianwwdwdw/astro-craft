@@ -105,30 +105,8 @@
   }
   body {
     @apply text-foreground;
-    /*
-     * A gradient painted across the *entire* (multi-thousand-px) document
-     * gets rasterized in tiles by the compositor, and dark/low-contrast
-     * gradients like this one show a visible banding seam at the tile
-     * boundary. Bounding each gradient layer's own size keeps it small
-     * enough to render as one piece, anchored once at the top/bottom of the
-     * document (not the viewport, which would repeat every scroll-height)
-     * — the flat backgroundColor carries the rest of the page seamlessly
-     * since it matches the linear-gradient's own end color.
-     */
-    background-color: var(--brand-bg-mid);
-    background-image:
-      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(90, 100, 120, 0.1), transparent 70%),
-      radial-gradient(ellipse 70% 60% at 50% 100%, rgba(180, 140, 90, 0.14), transparent 70%),
-      linear-gradient(180deg, var(--brand-bg-deep) 0%, var(--brand-bg-mid) 100%);
-    background-size:
-      100% 900px,
-      100% 900px,
-      100% 1600px;
-    background-position:
-      top,
-      bottom,
-      top;
-    background-repeat: no-repeat;
+    /* Always fully covered by Starfield's fixed, viewport-sized backdrop — this is just a fallback. */
+    background-color: var(--brand-bg-deep);
   }
   html {
     @apply font-sans;
