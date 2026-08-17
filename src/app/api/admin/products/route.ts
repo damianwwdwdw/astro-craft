@@ -69,6 +69,15 @@ export async function POST(request: Request) {
     typeof data.customFieldLabel === "string" && data.customFieldLabel.trim()
       ? data.customFieldLabel.trim()
       : null;
+  const customFieldType = data.customFieldType === "number" ? "number" : "text";
+  const customFieldMin =
+    customFieldLabel && customFieldType === "number" && typeof data.customFieldMin === "number"
+      ? data.customFieldMin
+      : null;
+  const customFieldMax =
+    customFieldLabel && customFieldType === "number" && typeof data.customFieldMax === "number"
+      ? data.customFieldMax
+      : null;
 
   if (!title || !excerpt || !description) {
     return NextResponse.json(
@@ -95,16 +104,39 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
+  if (
+    customFieldLabel &&
+    customFieldType === "number" &&
+    (customFieldMin === null || customFieldMax === null || customFieldMin > customFieldMax)
+  ) {
+    return NextResponse.json(
+      { success: false, error: "Podaj prawidłowy zakres liczbowy (min ≤ max)." },
+      { status: 400 }
+    );
+  }
 
   try {
     await ensureProductsTable();
     const slug = await getUniqueSlug(title);
 
     const { rows } = await getPool().query(
-      `INSERT INTO products (slug, category_slug, title, excerpt, description, features, images, color_ids, custom_field_label)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO products (slug, category_slug, title, excerpt, description, features, images, color_ids, custom_field_label, custom_field_type, custom_field_min, custom_field_max)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
-      [slug, categorySlug, title, excerpt, description, features, images, colorIds, customFieldLabel]
+      [
+        slug,
+        categorySlug,
+        title,
+        excerpt,
+        description,
+        features,
+        images,
+        colorIds,
+        customFieldLabel,
+        customFieldType,
+        customFieldMin,
+        customFieldMax,
+      ]
     );
 
     return NextResponse.json({ success: true, product: mapRow(rows[0]) });

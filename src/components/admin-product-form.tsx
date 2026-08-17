@@ -28,6 +28,9 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
   const [colorIds, setColorIds] = useState<string[]>([]);
   const [customFieldEnabled, setCustomFieldEnabled] = useState(false);
   const [customFieldLabel, setCustomFieldLabel] = useState("");
+  const [customFieldType, setCustomFieldType] = useState<"text" | "number">("text");
+  const [customFieldMin, setCustomFieldMin] = useState("");
+  const [customFieldMax, setCustomFieldMax] = useState("");
   const [status, setStatus] = useState<"idle" | "uploading" | "sending" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -44,6 +47,15 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
     );
   }
 
+  const parsedMin = Number(customFieldMin);
+  const parsedMax = Number(customFieldMax);
+  const numericRangeValid =
+    customFieldMin.trim() !== "" &&
+    customFieldMax.trim() !== "" &&
+    Number.isFinite(parsedMin) &&
+    Number.isFinite(parsedMax) &&
+    parsedMin <= parsedMax;
+
   const canSubmit =
     !busy &&
     title.trim() !== "" &&
@@ -52,7 +64,8 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
     categorySlug !== "" &&
     photos.files.length > 0 &&
     !photos.fileError &&
-    (!customFieldEnabled || customFieldLabel.trim() !== "");
+    (!customFieldEnabled ||
+      (customFieldLabel.trim() !== "" && (customFieldType === "text" || numericRangeValid)));
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -77,6 +90,9 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
           images: uploaded.map((f) => f.url),
           colorIds: colorsEnabled ? colorIds : [],
           customFieldLabel: customFieldEnabled ? customFieldLabel : null,
+          customFieldType,
+          customFieldMin: customFieldType === "number" ? parsedMin : null,
+          customFieldMax: customFieldType === "number" ? parsedMax : null,
         }),
       });
       const data = await response.json();
@@ -95,6 +111,9 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
       setColorIds([]);
       setCustomFieldEnabled(false);
       setCustomFieldLabel("");
+      setCustomFieldType("text");
+      setCustomFieldMin("");
+      setCustomFieldMax("");
       photos.reset();
       setStatus("idle");
       onCreated();
@@ -237,16 +256,67 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
           </div>
 
           {customFieldEnabled && (
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="product-custom-field-label">Etykieta pola *</Label>
-              <Input
-                id="product-custom-field-label"
-                required
-                value={customFieldLabel}
-                disabled={busy}
-                onChange={(event) => setCustomFieldLabel(event.target.value)}
-                placeholder="np. Podaj średnicę tuby (mm)"
-              />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="product-custom-field-label">Etykieta pola *</Label>
+                <Input
+                  id="product-custom-field-label"
+                  required
+                  value={customFieldLabel}
+                  disabled={busy}
+                  onChange={(event) => setCustomFieldLabel(event.target.value)}
+                  placeholder="np. Podaj średnicę tuby (mm)"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="product-custom-field-type">Typ pola</Label>
+                <select
+                  id="product-custom-field-type"
+                  value={customFieldType}
+                  disabled={busy}
+                  onChange={(event) => setCustomFieldType(event.target.value as "text" | "number")}
+                  className="border-input h-8 w-full rounded-lg border bg-transparent px-2.5 text-sm outline-none disabled:opacity-50"
+                >
+                  <option value="text">Tekstowe</option>
+                  <option value="number">Liczbowe (z zakresem)</option>
+                </select>
+              </div>
+
+              {customFieldType === "number" && (
+                <div className="flex gap-4">
+                  <div className="flex flex-1 flex-col gap-2">
+                    <Label htmlFor="product-custom-field-min">Minimum *</Label>
+                    <Input
+                      id="product-custom-field-min"
+                      type="number"
+                      required
+                      value={customFieldMin}
+                      disabled={busy}
+                      onChange={(event) => setCustomFieldMin(event.target.value)}
+                      placeholder="np. 20"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-2">
+                    <Label htmlFor="product-custom-field-max">Maksimum *</Label>
+                    <Input
+                      id="product-custom-field-max"
+                      type="number"
+                      required
+                      value={customFieldMax}
+                      disabled={busy}
+                      onChange={(event) => setCustomFieldMax(event.target.value)}
+                      placeholder="np. 250"
+                    />
+                  </div>
+                </div>
+              )}
+              {customFieldType === "number" && !numericRangeValid && (
+                <p className="text-muted-foreground -mt-2 text-xs">
+                  Podaj zakres w jednostce z etykiety (np. milimetrach) — minimum nie może być
+                  większe od maksimum.
+                </p>
+              )}
             </div>
           )}
 

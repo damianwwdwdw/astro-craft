@@ -44,28 +44,6 @@ export const STANDARD_COLORS: ProductColor[] = [
 
 export const PRODUCTS: Product[] = [
   {
-    slug: "szukacz-laserowy-vixen",
-    categorySlug: "akcesoria-do-teleskopow",
-    title: "Szukacz laserowy do teleskopu na stopce Vixen",
-    excerpt: "Precyzyjne celowanie bez szukania w polu widzenia okularu.",
-    description: [
-      "Szukacz laserowy do teleskopu, mocowany na standardowej stopce Vixen — pozwala szybko wycelować teleskop, zanim jeszcze spojrzysz przez okular.",
-    ],
-    features: [
-      "W zestawie: uchwyt szukacza, laser, śruby pozycjonujące, ładowarka, kluczyk zabezpieczający i smycz.",
-      "Śruby mają końcówki z tworzywa (widoczne na zdjęciu), które chronią obudowę lasera przed zarysowaniami i pozwalają precyzyjnie ustawić wiązkę.",
-      "Kluczyk pozwala trwale wyłączyć laser — przydatne, gdy w domu są dzieci.",
-      "Całość zapakowana w kartonowe pudełko z zabezpieczeniem z gąbki.",
-    ],
-    images: [
-      "/products/szukacz-laserowy/01-produkt.jpg",
-      "/products/szukacz-laserowy/02-w-akcji.jpg",
-      "/products/szukacz-laserowy/03-detal-srubka.jpg",
-      "/products/szukacz-laserowy/04-zestaw.jpg",
-    ],
-    colors: STANDARD_COLORS,
-  },
-  {
     slug: "odrosnik-na-tube",
     categorySlug: "akcesoria-do-teleskopow",
     title: "Odrośnik na tubę, szukacz, itd.",

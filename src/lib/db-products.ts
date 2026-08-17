@@ -1,6 +1,8 @@
 import { ensureProductsTable, getPool } from "@/lib/db";
 import { getProduct } from "@/lib/products";
 
+export type CustomFieldType = "text" | "number";
+
 export type DbProduct = {
   slug: string;
   categorySlug: string;
@@ -11,6 +13,9 @@ export type DbProduct = {
   images: string[];
   colorIds: string[];
   customFieldLabel: string | null;
+  customFieldType: CustomFieldType;
+  customFieldMin: number | null;
+  customFieldMax: number | null;
 };
 
 export function mapRow(row: {
@@ -23,6 +28,9 @@ export function mapRow(row: {
   images: string[];
   color_ids: string[] | null;
   custom_field_label: string | null;
+  custom_field_type: string | null;
+  custom_field_min: string | number | null;
+  custom_field_max: string | number | null;
 }): DbProduct {
   return {
     slug: row.slug,
@@ -37,6 +45,9 @@ export function mapRow(row: {
     images: row.images ?? [],
     colorIds: row.color_ids ?? [],
     customFieldLabel: row.custom_field_label,
+    customFieldType: row.custom_field_type === "number" ? "number" : "text",
+    customFieldMin: row.custom_field_min === null ? null : Number(row.custom_field_min),
+    customFieldMax: row.custom_field_max === null ? null : Number(row.custom_field_max),
   };
 }
 

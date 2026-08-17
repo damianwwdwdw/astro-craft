@@ -113,6 +113,15 @@ async function migrateProductsTable(): Promise<void> {
       created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`
   );
+
+  // Pole klienta może być tekstowe (jak dotąd) albo liczbowe z zakresem —
+  // istniejące wiersze dostają 'text' (zgodne z ich dotychczasowym
+  // zachowaniem), min/max zostają puste dopóki admin ich nie ustawi.
+  await pool.query(
+    `ALTER TABLE products ADD COLUMN IF NOT EXISTS custom_field_type TEXT NOT NULL DEFAULT 'text'`
+  );
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS custom_field_min NUMERIC`);
+  await pool.query(`ALTER TABLE products ADD COLUMN IF NOT EXISTS custom_field_max NUMERIC`);
 }
 
 export function ensureProductsTable(): Promise<void> {
