@@ -69,3 +69,27 @@ export function ensureReviewsTable(): Promise<void> {
   }
   return reviewsTableReady;
 }
+
+let savedCartsTableReady: Promise<void> | null = null;
+
+async function migrateSavedCartsTable(): Promise<void> {
+  const pool = getPool();
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS saved_carts (
+      token TEXT PRIMARY KEY,
+      items JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`
+  );
+}
+
+export function ensureSavedCartsTable(): Promise<void> {
+  if (!savedCartsTableReady) {
+    savedCartsTableReady = migrateSavedCartsTable().catch((error) => {
+      savedCartsTableReady = null;
+      throw error;
+    });
+  }
+  return savedCartsTableReady;
+}

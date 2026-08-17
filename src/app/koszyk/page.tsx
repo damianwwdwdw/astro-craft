@@ -23,6 +23,7 @@ import {
 import { ColorSwatchGrid } from "@/components/color-swatch-grid";
 import { DEFAULT_HOLE_RATIO, type MaskType, type Mounting } from "@/components/mask-configurator";
 import { MaskPreview, type MaskPreviewProps } from "@/components/mask-3d-preview";
+import { SaveCartButton } from "@/components/save-cart-button";
 import { Footer } from "@/components/sections/footer";
 import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
@@ -32,16 +33,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart, type CartItem } from "@/lib/cart-context";
+import { describeItem } from "@/lib/describe-cart-item";
 import { getProduct } from "@/lib/products";
-
-function describeItem(item: CartItem): string {
-  const parts: string[] = [];
-  if (item.colorName) parts.push(`kolor: ${item.colorName}`);
-  if (item.specs && item.specs.length > 0) {
-    parts.push(item.specs.map((spec) => `${spec.label}: ${spec.value}`).join(", "));
-  }
-  return parts.join(", ");
-}
 
 function extractNumber(value: string): number | null {
   const match = value.match(/[\d.]+/);
@@ -150,7 +143,10 @@ export default function CartPage() {
             Przejdź do sklepu
           </Button>
 
-          <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Koszyk</h1>
+          <div className="flex items-center justify-between gap-4">
+            <h1 className="font-heading text-2xl font-semibold sm:text-3xl">Koszyk</h1>
+            <SaveCartButton />
+          </div>
 
           {items.length === 0 ? (
             <div className="mt-10 flex flex-col items-center gap-4 text-center">
