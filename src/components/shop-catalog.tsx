@@ -4,17 +4,18 @@ import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES } from "@/lib/categories";
+import type { DbProduct } from "@/lib/db-products";
 import { getProductsByCategory, type Product } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 type ResultItem =
-  | { kind: "product"; key: string; product: Product }
+  | { kind: "product"; key: string; product: Product | DbProduct }
   | { kind: "category"; key: string; category: (typeof CATEGORIES)[number] };
 
 export function ShopCatalog() {
@@ -23,6 +24,16 @@ export function ShopCatalog() {
   const selectedSlug = searchParams.get("kategoria") ?? "wszystko";
 
   const [searchText, setSearchText] = useState("");
+  const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) setDbProducts(data.products);
+      })
+      .catch(() => {});
+  }, []);
 
   function selectCategory(slug: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -43,7 +54,10 @@ export function ShopCatalog() {
       if (category.slug === "wszystko") continue;
       if (selectedSlug !== "wszystko" && category.slug !== selectedSlug) continue;
 
-      const products = getProductsByCategory(category.slug);
+      const products: (Product | DbProduct)[] = [
+        ...getProductsByCategory(category.slug),
+        ...dbProducts.filter((product) => product.categorySlug === category.slug),
+      ];
       if (products.length > 0) {
         for (const product of products) {
           const matches =
@@ -67,7 +81,7 @@ export function ShopCatalog() {
     }
 
     return items;
-  }, [selectedSlug, searchText]);
+  }, [selectedSlug, searchText, dbProducts]);
 
   return (
     <div>

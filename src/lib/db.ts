@@ -93,3 +93,34 @@ export function ensureSavedCartsTable(): Promise<void> {
   }
   return savedCartsTableReady;
 }
+
+let productsTableReady: Promise<void> | null = null;
+
+async function migrateProductsTable(): Promise<void> {
+  const pool = getPool();
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS products (
+      slug TEXT PRIMARY KEY,
+      category_slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      excerpt TEXT NOT NULL,
+      description TEXT NOT NULL,
+      features TEXT[] NOT NULL DEFAULT '{}',
+      images TEXT[] NOT NULL,
+      color_ids TEXT[],
+      custom_field_label TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`
+  );
+}
+
+export function ensureProductsTable(): Promise<void> {
+  if (!productsTableReady) {
+    productsTableReady = migrateProductsTable().catch((error) => {
+      productsTableReady = null;
+      throw error;
+    });
+  }
+  return productsTableReady;
+}

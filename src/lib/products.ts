@@ -23,7 +23,7 @@ export type Product = {
 };
 
 // Standardowa paleta kolorów/wykończeń — współdzielona przez produkty drukowane na miarę.
-const STANDARD_COLORS: ProductColor[] = [
+export const STANDARD_COLORS: ProductColor[] = [
   { id: "czarny", name: "Czarny", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/czarny.png" },
   { id: "bialy", name: "Biały", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/bialy.png" },
   { id: "kosciana-biel", name: "Kościana Biel", finish: "Wykończenie klasyczne", swatch: "/products/szukacz-laserowy/kolory/kosciana-biel.png" },

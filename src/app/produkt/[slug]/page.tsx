@@ -2,6 +2,7 @@ import { ArrowLeft, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CustomProductConfigurator } from "@/components/custom-product-configurator";
 import { ProductColorPicker } from "@/components/product-color-picker";
 import { ProductGallery } from "@/components/product-gallery";
 import { RiserConfigurator } from "@/components/riser-configurator";
@@ -10,6 +11,7 @@ import { Footer } from "@/components/sections/footer";
 import { Header } from "@/components/sections/header";
 import { CONTAINER } from "@/components/sections/shared";
 import { Button } from "@/components/ui/button";
+import { getDbProductBySlug } from "@/lib/db-products";
 import { getProduct, PRODUCTS } from "@/lib/products";
 
 export function generateStaticParams() {
@@ -22,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = getProduct(slug) ?? (await getDbProductBySlug(slug));
   if (!product) return {};
   return {
     title: `${product.title} — Astro Craft`,
@@ -36,7 +38,9 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const staticProduct = getProduct(slug);
+  const dbProduct = staticProduct ? null : await getDbProductBySlug(slug);
+  const product = staticProduct ?? dbProduct;
   if (!product) notFound();
 
   return (
@@ -81,9 +85,12 @@ export default async function ProductPage({
                 ))}
               </ul>
 
-              {product.stageOptions && product.stageOptions.length > 0 ? (
+              {dbProduct ? (
+                <CustomProductConfigurator product={dbProduct} />
+              ) : "stageOptions" in product && product.stageOptions && product.stageOptions.length > 0 ? (
                 <StageSelector product={product} />
               ) : (
+                "colors" in product &&
                 product.colors &&
                 product.colors.length > 0 &&
                 (product.requiresDimensions ? (
