@@ -18,6 +18,11 @@ export function generateStaticParams() {
   return PRODUCTS.map((product) => ({ slug: product.slug }));
 }
 
+// Produkty z bazy (dodawane/edytowane w /admin/produkty) muszą być widoczne
+// od razu po zapisie — bez tego Next.js buforowałby pierwsze wygenerowanie
+// strony i nie odświeżał jej po kolejnych edycjach w panelu.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
