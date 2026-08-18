@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import Image from "next/image";
 import { useState, type FormEvent } from "react";
 import { AttachmentField } from "@/components/attachment-field";
@@ -12,25 +12,47 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ALLOWED_IMAGE_TYPES } from "@/lib/attachment-limits";
 import { CATEGORIES } from "@/lib/categories";
+import type { DbProduct } from "@/lib/db-products";
 import { STANDARD_COLORS } from "@/lib/products";
 import { useAttachmentUpload } from "@/lib/use-attachment-upload";
+import { MAX_PRODUCT_IMAGES } from "@/lib/validate-product-input";
 import { cn } from "@/lib/utils";
 
 const SELECTABLE_CATEGORIES = CATEGORIES.filter((c) => c.slug !== "wszystko" && !c.href);
 
-export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
-  const [title, setTitle] = useState("");
-  const [categorySlug, setCategorySlug] = useState(SELECTABLE_CATEGORIES[0]?.slug ?? "");
-  const [excerpt, setExcerpt] = useState("");
-  const [description, setDescription] = useState("");
-  const [features, setFeatures] = useState("");
-  const [colorsEnabled, setColorsEnabled] = useState(false);
-  const [colorIds, setColorIds] = useState<string[]>([]);
-  const [customFieldEnabled, setCustomFieldEnabled] = useState(false);
-  const [customFieldLabel, setCustomFieldLabel] = useState("");
-  const [customFieldType, setCustomFieldType] = useState<"text" | "number">("text");
-  const [customFieldMin, setCustomFieldMin] = useState("");
-  const [customFieldMax, setCustomFieldMax] = useState("");
+export function AdminProductForm({
+  product,
+  onSaved,
+  onCancel,
+}: {
+  /** Gdy podane, formularz edytuje ten produkt zamiast tworzyć nowy. */
+  product?: DbProduct;
+  onSaved: () => void;
+  onCancel?: () => void;
+}) {
+  const isEditing = Boolean(product);
+
+  const [title, setTitle] = useState(product?.title ?? "");
+  const [categorySlug, setCategorySlug] = useState(
+    product?.categorySlug ?? SELECTABLE_CATEGORIES[0]?.slug ?? ""
+  );
+  const [excerpt, setExcerpt] = useState(product?.excerpt ?? "");
+  const [description, setDescription] = useState(product?.description.join("\n\n") ?? "");
+  const [features, setFeatures] = useState(product?.features.join("\n") ?? "");
+  const [existingImages, setExistingImages] = useState<string[]>(product?.images ?? []);
+  const [colorsEnabled, setColorsEnabled] = useState(Boolean(product?.colorIds.length));
+  const [colorIds, setColorIds] = useState<string[]>(product?.colorIds ?? []);
+  const [customFieldEnabled, setCustomFieldEnabled] = useState(Boolean(product?.customFieldLabel));
+  const [customFieldLabel, setCustomFieldLabel] = useState(product?.customFieldLabel ?? "");
+  const [customFieldType, setCustomFieldType] = useState<"text" | "number">(
+    product?.customFieldType ?? "text"
+  );
+  const [customFieldMin, setCustomFieldMin] = useState(
+    product?.customFieldMin != null ? String(product.customFieldMin) : ""
+  );
+  const [customFieldMax, setCustomFieldMax] = useState(
+    product?.customFieldMax != null ? String(product.customFieldMax) : ""
+  );
   const [status, setStatus] = useState<"idle" | "uploading" | "sending" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,11 +62,16 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
   });
 
   const busy = status === "uploading" || status === "sending";
+  const totalImages = existingImages.length + photos.files.length;
 
   function toggleColor(id: string) {
     setColorIds((current) =>
       current.includes(id) ? current.filter((c) => c !== id) : [...current, id]
     );
+  }
+
+  function removeExistingImage(url: string) {
+    setExistingImages((current) => current.filter((img) => img !== url));
   }
 
   const parsedMin = Number(customFieldMin);
@@ -62,10 +89,27 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
     excerpt.trim() !== "" &&
     description.trim() !== "" &&
     categorySlug !== "" &&
-    photos.files.length > 0 &&
+    totalImages > 0 &&
+    totalImages <= MAX_PRODUCT_IMAGES &&
     !photos.fileError &&
     (!customFieldEnabled ||
       (customFieldLabel.trim() !== "" && (customFieldType === "text" || numericRangeValid)));
+
+  function resetForm() {
+    setTitle("");
+    setExcerpt("");
+    setDescription("");
+    setFeatures("");
+    setExistingImages([]);
+    setColorsEnabled(false);
+    setColorIds([]);
+    setCustomFieldEnabled(false);
+    setCustomFieldLabel("");
+    setCustomFieldType("text");
+    setCustomFieldMin("");
+    setCustomFieldMax("");
+    photos.reset();
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -78,45 +122,37 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
       const uploaded = await photos.uploadAll();
 
       setStatus("sending");
-      const response = await fetch("/api/admin/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          categorySlug,
-          excerpt,
-          description,
-          features: features.split("\n"),
-          images: uploaded.map((f) => f.url),
-          colorIds: colorsEnabled ? colorIds : [],
-          customFieldLabel: customFieldEnabled ? customFieldLabel : null,
-          customFieldType,
-          customFieldMin: customFieldType === "number" ? parsedMin : null,
-          customFieldMax: customFieldType === "number" ? parsedMax : null,
-        }),
-      });
+      const response = await fetch(
+        isEditing ? `/api/admin/products/${product!.slug}` : "/api/admin/products",
+        {
+          method: isEditing ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title,
+            categorySlug,
+            excerpt,
+            description,
+            features: features.split("\n"),
+            images: [...existingImages, ...uploaded.map((f) => f.url)],
+            colorIds: colorsEnabled ? colorIds : [],
+            customFieldLabel: customFieldEnabled ? customFieldLabel : null,
+            customFieldType,
+            customFieldMin: customFieldType === "number" ? parsedMin : null,
+            customFieldMax: customFieldType === "number" ? parsedMax : null,
+          }),
+        }
+      );
       const data = await response.json();
 
       if (!response.ok || !data.success) {
         setStatus("error");
-        setErrorMessage(data.error ?? "Nie udało się dodać produktu.");
+        setErrorMessage(data.error ?? "Nie udało się zapisać produktu.");
         return;
       }
 
-      setTitle("");
-      setExcerpt("");
-      setDescription("");
-      setFeatures("");
-      setColorsEnabled(false);
-      setColorIds([]);
-      setCustomFieldEnabled(false);
-      setCustomFieldLabel("");
-      setCustomFieldType("text");
-      setCustomFieldMin("");
-      setCustomFieldMax("");
-      photos.reset();
+      if (!isEditing) resetForm();
       setStatus("idle");
-      onCreated();
+      onSaved();
     } catch {
       setStatus("error");
       setErrorMessage("Nie udało się przesłać danych. Spróbuj ponownie.");
@@ -127,7 +163,9 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
     <Card>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <p className="font-heading font-semibold">Dodaj ogłoszenie</p>
+          <p className="font-heading font-semibold">
+            {isEditing ? "Edytuj ogłoszenie" : "Dodaj ogłoszenie"}
+          </p>
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="product-title">Tytuł *</Label>
@@ -194,6 +232,28 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
             />
           </div>
 
+          {existingImages.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <Label>Obecne zdjęcia</Label>
+              <div className="flex flex-wrap gap-2">
+                {existingImages.map((url) => (
+                  <div key={url} className="relative size-16 shrink-0 overflow-hidden rounded-lg">
+                    <Image src={url} alt="" fill className="object-cover" />
+                    <button
+                      type="button"
+                      disabled={busy}
+                      aria-label="Usuń zdjęcie"
+                      onClick={() => removeExistingImage(url)}
+                      className="absolute top-0.5 right-0.5 flex size-5 items-center justify-center rounded-full bg-black/60 text-white"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <AttachmentField
             id="product-photos"
             files={photos.files}
@@ -203,7 +263,11 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
             onRemoveFile={photos.removeFile}
             disabled={busy}
             accept={ALLOWED_IMAGE_TYPES.join(",")}
-            hint="Zdjęcia produktu (jpg, png, gif, webp) — pierwsze będzie zdjęciem głównym."
+            hint={
+              isEditing
+                ? "Dodaj nowe zdjęcia (opcjonalnie) — pierwsze na liście powyżej jest zdjęciem głównym."
+                : "Zdjęcia produktu (jpg, png, gif, webp) — pierwsze będzie zdjęciem głównym."
+            }
           />
 
           <div className="flex items-center gap-2">
@@ -322,17 +386,26 @@ export function AdminProductForm({ onCreated }: { onCreated: () => void }) {
 
           {status === "error" && <p className="text-destructive text-sm">{errorMessage}</p>}
 
-          <Button
-            type="submit"
-            disabled={!canSubmit}
-            className="from-brand-violet to-brand-periwinkle w-fit bg-gradient-to-br px-6 py-3 text-white"
-          >
-            {status === "uploading"
-              ? "Przesyłanie zdjęć..."
-              : status === "sending"
-                ? "Zapisywanie..."
-                : "Dodaj ogłoszenie"}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="submit"
+              disabled={!canSubmit}
+              className="from-brand-violet to-brand-periwinkle w-fit bg-gradient-to-br px-6 py-3 text-white"
+            >
+              {status === "uploading"
+                ? "Przesyłanie zdjęć..."
+                : status === "sending"
+                  ? "Zapisywanie..."
+                  : isEditing
+                    ? "Zapisz zmiany"
+                    : "Dodaj ogłoszenie"}
+            </Button>
+            {isEditing && (
+              <Button type="button" variant="ghost" disabled={busy} onClick={onCancel}>
+                Anuluj
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>

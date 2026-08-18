@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Package, Trash2 } from "lucide-react";
+import { LogOut, Package, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +18,7 @@ export function AdminProductsPanel() {
   const router = useRouter();
   const [products, setProducts] = useState<DbProduct[] | null>(null);
   const [error, setError] = useState("");
+  const [editingProduct, setEditingProduct] = useState<DbProduct | null>(null);
 
   function load() {
     fetch("/api/admin/products")
@@ -35,7 +36,13 @@ export function AdminProductsPanel() {
   useEffect(load, []);
 
   async function remove(slug: string) {
+    if (editingProduct?.slug === slug) setEditingProduct(null);
     await fetch(`/api/admin/products/${slug}`, { method: "DELETE" });
+    load();
+  }
+
+  function handleSaved() {
+    setEditingProduct(null);
     load();
   }
 
@@ -58,7 +65,12 @@ export function AdminProductsPanel() {
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
-      <AdminProductForm onCreated={load} />
+      <AdminProductForm
+        key={editingProduct?.slug ?? "new"}
+        product={editingProduct ?? undefined}
+        onSaved={handleSaved}
+        onCancel={() => setEditingProduct(null)}
+      />
 
       <section className="flex flex-col gap-4">
         <h2 className="font-heading text-lg font-semibold">Twoje ogłoszenia</h2>
@@ -89,15 +101,26 @@ export function AdminProductsPanel() {
                       {categoryTitle(product.categorySlug)}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon-sm"
-                    aria-label={`Usuń ${product.title}`}
-                    onClick={() => remove(product.slug)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label={`Edytuj ${product.title}`}
+                      onClick={() => setEditingProduct(product)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon-sm"
+                      aria-label={`Usuń ${product.title}`}
+                      onClick={() => remove(product.slug)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
