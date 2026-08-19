@@ -128,7 +128,7 @@ export const PRODUCTS: Product[] = [
   {
     slug: "elastyczna-zaslepka-na-okular",
     categorySlug: "elementy-zamienne",
-    title: "Elastyczna zaślepka na okular",
+    title: "Zaślepka na okular",
     excerpt: "Elastyczna, silikonowa w dotyku zaślepka chroniąca okular przed kurzem i wilgocią.",
     description: [
       "Elastyczna zaślepka na okular — chroni soczewkę przed kurzem, wilgocią i zarysowaniami, gdy okular nie jest używany. Dzięki elastycznemu materiałowi łatwo się zakłada i ściąga, a jednocześnie pewnie trzyma się na okularze.",
