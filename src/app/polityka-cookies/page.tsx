@@ -13,12 +13,6 @@ export const metadata: Metadata = {
 
 const STORED_ITEMS = [
   {
-    name: "admin_session",
-    type: "Plik cookie (httpOnly), ważny 7 dni",
-    purpose:
-      "Utrzymuje sesję logowania w panelu administracyjnym. Ustawiany wyłącznie po zalogowaniu się właściciela strony — zwykli odwiedzający nigdy go nie otrzymują.",
-  },
-  {
     name: "astro-craft-cart",
     type: "Lokalny zapis w przeglądarce (localStorage)",
     purpose:
