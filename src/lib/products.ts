@@ -22,6 +22,8 @@ export type Product = {
   stageOptions?: { id: string; label: string }[];
   /** Filtr słoneczny: wariant pojedynczy/bino + średnica standardowa/własna + opcjonalny napis. */
   requiresSolarFilterConfig?: boolean;
+  /** Zaślepka na okular: wybór średnicy (1,25"/2"/własna) + kolor. */
+  requiresEyepieceCapConfig?: boolean;
 };
 
 // Standardowa paleta kolorów/wykończeń — współdzielona przez produkty drukowane na miarę.
@@ -119,6 +121,43 @@ export const PRODUCTS: Product[] = [
     ],
     colors: STANDARD_COLORS,
     requiresSolarFilterConfig: true,
+  },
+  {
+    slug: "elastyczna-zaslepka-na-okular",
+    categorySlug: "elementy-zamienne",
+    title: "Elastyczna zaślepka na okular",
+    excerpt: "Elastyczna, silikonowa w dotyku zaślepka chroniąca okular przed kurzem i wilgocią.",
+    description: [
+      "Elastyczna zaślepka na okular — chroni soczewkę przed kurzem, wilgocią i zarysowaniami, gdy okular nie jest używany. Dzięki elastycznemu materiałowi łatwo się zakłada i ściąga, a jednocześnie pewnie trzyma się na okularze.",
+      "Do wyboru dwie standardowe średnice (1,25 cala i 2 cale) albo dowolna średnica podana przez Ciebie.",
+    ],
+    features: [
+      "Elastyczny materiał — łatwy montaż i zdejmowanie, pewne trzymanie.",
+      "Chroni soczewkę okularu przed kurzem, wilgocią i zarysowaniami.",
+      "Średnica 1,25 cala, 2 cale albo podana indywidualnie w mm.",
+    ],
+    images: [
+      "/products/zaslepka-na-okular/01-produkt.jpg",
+      "/products/zaslepka-na-okular/02-produkt-gora.jpg",
+      "/products/zaslepka-na-okular/03-w-akcji-na-okularze.jpg",
+      "/products/zaslepka-na-okular/04-para.jpg",
+      "/products/zaslepka-na-okular/05-detal-elastycznosc.jpg",
+    ],
+    colors: [
+      {
+        id: "elastyczny-czarny",
+        name: "Elastyczny Czarny",
+        finish: "Wykończenie klasyczne",
+        swatch: "/products/szukacz-laserowy/kolory/czarny.png",
+      },
+      {
+        id: "elastyczny-pomaranczowy",
+        name: "Elastyczny Pomarańczowy",
+        finish: "Wykończenie klasyczne",
+        swatch: "/products/szukacz-laserowy/kolory/mandarynkowy.png",
+      },
+    ],
+    requiresEyepieceCapConfig: true,
   },
 ];
 

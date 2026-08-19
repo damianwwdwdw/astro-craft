@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CustomProductConfigurator } from "@/components/custom-product-configurator";
+import { EyepieceCapConfigurator } from "@/components/eyepiece-cap-configurator";
 import { ProductColorPicker } from "@/components/product-color-picker";
 import { ProductGallery } from "@/components/product-gallery";
 import { RiserConfigurator } from "@/components/riser-configurator";
@@ -95,6 +96,8 @@ export default async function ProductPage({
                 <CustomProductConfigurator product={dbProduct} />
               ) : "requiresSolarFilterConfig" in product && product.requiresSolarFilterConfig ? (
                 <SolarFilterConfigurator product={product} />
+              ) : "requiresEyepieceCapConfig" in product && product.requiresEyepieceCapConfig ? (
+                <EyepieceCapConfigurator product={product} />
               ) : "stageOptions" in product && product.stageOptions && product.stageOptions.length > 0 ? (
                 <StageSelector product={product} />
               ) : (
