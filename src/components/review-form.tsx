@@ -1,7 +1,7 @@
 "use client";
 
 import { upload } from "@vercel/blob/client";
-import { AlertCircle, CheckCircle2, Paperclip, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Gift, Paperclip, X } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { StarRatingInput } from "@/components/star-rating";
 import { Button } from "@/components/ui/button";
@@ -115,6 +115,15 @@ export function ReviewForm() {
 
   return (
     <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-md flex-col gap-6">
+      <div className="border-brand-violet/30 bg-brand-violet/10 flex items-start gap-3 rounded-2xl border p-4">
+        <Gift className="text-brand-violet mt-0.5 size-5 shrink-0" />
+        <p className="text-sm leading-relaxed">
+          Dodaj opinię wraz ze zdjęciem produktu i zgarnij{" "}
+          <span className="font-semibold">rabat 10% na kolejne zamówienie</span> — wystarczy
+          wspomnieć o tym przy składaniu zamówienia.
+        </p>
+      </div>
+
       <Card>
         <CardContent className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
