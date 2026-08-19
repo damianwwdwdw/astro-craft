@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CONTAINER } from "@/components/sections/shared";
 
 export function Footer() {
@@ -9,6 +10,12 @@ export function Footer() {
         <p className="text-muted-foreground text-sm">
           © {new Date().getFullYear()} Astro Craft. Wszelkie prawa zastrzeżone.
         </p>
+        <Link
+          href="/polityka-cookies"
+          className="text-muted-foreground hover:text-foreground text-xs underline underline-offset-2 transition-colors"
+        >
+          Polityka plików cookie
+        </Link>
       </div>
     </footer>
   );

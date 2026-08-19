@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { CookieNotice } from "@/components/cookie-notice";
 import { Starfield } from "@/components/starfield";
 import { CartProvider } from "@/lib/cart-context";
 import "./globals.css";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="relative z-10 flex min-h-full flex-1 flex-col">
           <CartProvider>{children}</CartProvider>
         </div>
+        <CookieNotice />
       </body>
     </html>
   );
