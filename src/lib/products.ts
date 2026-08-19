@@ -149,13 +149,13 @@ export const PRODUCTS: Product[] = [
     colors: [
       {
         id: "elastyczny-czarny",
-        name: "Elastyczny Czarny",
+        name: "Czarny",
         finish: "Wykończenie z elastycznego materiału",
         swatch: "/products/szukacz-laserowy/kolory/czarny.png",
       },
       {
         id: "elastyczny-pomaranczowy",
-        name: "Elastyczny Pomarańczowy",
+        name: "Pomarańczowy",
         finish: "Wykończenie z elastycznego materiału",
         swatch: "/products/szukacz-laserowy/kolory/mandarynkowy.png",
       },
