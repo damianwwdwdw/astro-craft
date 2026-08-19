@@ -20,6 +20,8 @@ export type Product = {
   requiresDimensions?: boolean;
   /** Starship + Booster: wybór elementów (checkboxy) zamiast koloru. */
   stageOptions?: { id: string; label: string }[];
+  /** Filtr słoneczny: wariant pojedynczy/bino + średnica standardowa/własna + opcjonalny napis. */
+  requiresSolarFilterConfig?: boolean;
 };
 
 // Standardowa paleta kolorów/wykończeń — współdzielona przez produkty drukowane na miarę.
@@ -89,6 +91,32 @@ export const PRODUCTS: Product[] = [
       { id: "starship", label: "Starship skala 1:200" },
       { id: "booster", label: "Booster skala 1:200" },
     ],
+  },
+  {
+    slug: "filtr-sloneczny-baader-nd-5",
+    categorySlug: "akcesoria-do-teleskopow",
+    title: "Filtr słoneczny Baader ND 5.0",
+    excerpt: "Bezpieczna, wizualna obserwacja Słońca — na lornetkę lub teleskop, w wersji pojedynczej lub bino.",
+    description: [
+      "Oprawka na folię filtra słonecznego Baader ND 5.0, drukowana na miarę pod Twój sprzęt — pojedyncza na jeden obiektyw albo podwójna (bino) na lornetkę.",
+      "Do wyboru standardowa średnica obiektywu 43-64mm, pasująca do większości lornetek oraz teleskopów Dobson, albo dowolna średnica podana przez Ciebie.",
+    ],
+    features: [
+      "Filtr ND 5.0 (Baader) — bezpieczna, wizualna obserwacja Słońca.",
+      "Wersja pojedyncza (jeden obiektyw) lub bino (na lornetkę).",
+      "Średnica standardowa 43-64mm albo podana indywidualnie.",
+      "Możliwość dodania własnego napisu na oprawce.",
+    ],
+    images: [
+      "/products/filtr-sloneczny/01-produkt.jpg",
+      "/products/filtr-sloneczny/02-napis.jpg",
+      "/products/filtr-sloneczny/03-w-akcji-lornetka.jpg",
+      "/products/filtr-sloneczny/04-bino.jpg",
+      "/products/filtr-sloneczny/05-w-akcji-teleskop.jpg",
+      "/products/filtr-sloneczny/06-detal-teleskop.jpg",
+      "/products/filtr-sloneczny/07-detal-mocowanie.jpg",
+    ],
+    requiresSolarFilterConfig: true,
   },
 ];
 

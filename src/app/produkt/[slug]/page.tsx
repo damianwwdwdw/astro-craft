@@ -6,6 +6,7 @@ import { CustomProductConfigurator } from "@/components/custom-product-configura
 import { ProductColorPicker } from "@/components/product-color-picker";
 import { ProductGallery } from "@/components/product-gallery";
 import { RiserConfigurator } from "@/components/riser-configurator";
+import { SolarFilterConfigurator } from "@/components/solar-filter-configurator";
 import { StageSelector } from "@/components/stage-selector";
 import { Footer } from "@/components/sections/footer";
 import { Header } from "@/components/sections/header";
@@ -92,6 +93,8 @@ export default async function ProductPage({
 
               {dbProduct ? (
                 <CustomProductConfigurator product={dbProduct} />
+              ) : "requiresSolarFilterConfig" in product && product.requiresSolarFilterConfig ? (
+                <SolarFilterConfigurator product={product} />
               ) : "stageOptions" in product && product.stageOptions && product.stageOptions.length > 0 ? (
                 <StageSelector product={product} />
               ) : (
