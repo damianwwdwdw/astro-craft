@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: "/#o-nas", label: "O mnie" },
   { href: "/#proces", label: "Jak to działa" },
   { href: "/#galeria", label: "Galeria" },
+  { href: "/#opinie", label: "Opinie" },
 ];
 
 export function Header() {
