@@ -2,6 +2,7 @@
 
 import { Check, ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import { ColorSwatchGrid } from "@/components/color-swatch-grid";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,8 @@ function PillButton({
 
 export function SolarFilterConfigurator({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const colors = product.colors ?? [];
+  const [colorId, setColorId] = useState(colors[0]?.id ?? "");
   const [variant, setVariant] = useState<Variant | null>(null);
   const [diameterMode, setDiameterMode] = useState<DiameterMode>("standard");
   const [customDiameter, setCustomDiameter] = useState("");
@@ -52,17 +55,19 @@ export function SolarFilterConfigurator({ product }: { product: Product }) {
   const [customText, setCustomText] = useState("");
   const [added, setAdded] = useState(false);
 
+  const selectedColor = colors.find((color) => color.id === colorId);
   const parsedCustomDiameter = Number(customDiameter);
   const customDiameterValid =
     customDiameter.trim() !== "" && Number.isFinite(parsedCustomDiameter) && parsedCustomDiameter > 0;
 
   const canAddToCart =
+    !!selectedColor &&
     variant !== null &&
     (diameterMode === "standard" || customDiameterValid) &&
     (!hasCustomText || customText.trim() !== "");
 
   function handleAddToCart() {
-    if (!canAddToCart || !variant) return;
+    if (!canAddToCart || !variant || !selectedColor) return;
 
     const variantLabel = VARIANT_OPTIONS.find((option) => option.id === variant)!.label;
     const diameterValue =
@@ -74,6 +79,8 @@ export function SolarFilterConfigurator({ product }: { product: Product }) {
       productSlug: product.slug,
       productTitle: product.title,
       productImage: product.images[0],
+      colorId: selectedColor.id,
+      colorName: selectedColor.name,
       specs: [
         { label: "Wariant", value: variantLabel },
         { label: "Średnica obiektywu", value: diameterValue },
@@ -102,6 +109,13 @@ export function SolarFilterConfigurator({ product }: { product: Product }) {
           ))}
         </div>
       </div>
+
+      {colors.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <Label>Kolor</Label>
+          <ColorSwatchGrid colors={colors} selectedId={colorId} onSelect={(color) => setColorId(color.id)} />
+        </div>
+      )}
 
       {variant !== null && (
         <div className="flex flex-col gap-2">
@@ -174,7 +188,7 @@ export function SolarFilterConfigurator({ product }: { product: Product }) {
         ) : (
           <>
             <ShoppingCart className="size-4" />
-            Dodaj do koszyka
+            Dodaj do koszyka{selectedColor ? ` — ${selectedColor.name}` : ""}
           </>
         )}
       </Button>
