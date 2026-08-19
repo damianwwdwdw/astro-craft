@@ -1,4 +1,7 @@
-export type ProductColorFinish = "Wykończenie klasyczne" | "Wykończenie w połysku";
+export type ProductColorFinish =
+  | "Wykończenie klasyczne"
+  | "Wykończenie w połysku"
+  | "Wykończenie z elastycznego materiału";
 
 export type ProductColor = {
   id: string;
@@ -137,23 +140,23 @@ export const PRODUCTS: Product[] = [
       "Średnica 1,25 cala, 2 cale albo podana indywidualnie w mm.",
     ],
     images: [
+      "/products/zaslepka-na-okular/05-detal-elastycznosc.jpg",
       "/products/zaslepka-na-okular/01-produkt.jpg",
       "/products/zaslepka-na-okular/02-produkt-gora.jpg",
       "/products/zaslepka-na-okular/03-w-akcji-na-okularze.jpg",
       "/products/zaslepka-na-okular/04-para.jpg",
-      "/products/zaslepka-na-okular/05-detal-elastycznosc.jpg",
     ],
     colors: [
       {
         id: "elastyczny-czarny",
         name: "Elastyczny Czarny",
-        finish: "Wykończenie klasyczne",
+        finish: "Wykończenie z elastycznego materiału",
         swatch: "/products/szukacz-laserowy/kolory/czarny.png",
       },
       {
         id: "elastyczny-pomaranczowy",
         name: "Elastyczny Pomarańczowy",
-        finish: "Wykończenie klasyczne",
+        finish: "Wykończenie z elastycznego materiału",
         swatch: "/products/szukacz-laserowy/kolory/mandarynkowy.png",
       },
     ],
